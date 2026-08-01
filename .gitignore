@@ -1,0 +1,28 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User settings (contains YOUR local paths — dont share)
+**/settings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Logs
+*.log
+# SoulsFormatsNEXT is a separate repo — users clone it themselves
+SoulsFormatsNEXT/

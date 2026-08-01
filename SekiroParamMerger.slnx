@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SekiroParamMerger.Console/SekiroParamMerger.Console.csproj" />
+  <Project Path="SekiroParamMerger.Core/SekiroParamMerger.Core.csproj" />
+</Solution>
