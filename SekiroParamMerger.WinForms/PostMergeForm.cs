@@ -45,49 +45,37 @@ namespace SekiroParamMerger.WinForms
         {
             Styling.ApplyDarkTheme(this);
             this.Text = "Merge Complete";
-            this.Size = new Size(680, 560);
+            this.Icon = AppIcon.Create();
+            this.ClientSize = new Size(760, 580);
             this.StartPosition = FormStartPosition.CenterParent;
-            this.MinimumSize   = new Size(640, 500);
-
-            Styling.StyleHeader(lblTitle);
-            Styling.StyleCard(pnlSummary);
-            Styling.StyleCard(pnlDelete);
-            Styling.StyleCheckBox(chkKeepFiles);
-            Styling.StyleButton(btnSave, isPrimary: true);
-            Styling.StyleButton(btnClose);
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.Shown += (_, _) => Styling.MakeWindowRounded(this, 20);
         }
 
         private void PopulateSummary()
         {
-            // ── Output path ───────────────────────────────────────────────────
             _finalOutputPath = Path.Combine(
                 _outputFolder, "param", "gameparam", "gameparam.parambnd.dcx");
 
-            lblOutputPath.Text = $"Output: {_finalOutputPath}";
-            lblOutputPath.ForeColor = Styling.TextSecondary;
-
-            // ── Stats ─────────────────────────────────────────────────────────
-            lblStatA.Text      = $"Cells from {_modAName}: {_mergeResult.TotalCellsFromA}";
-            lblStatA.ForeColor = Styling.ModAColor;
-
-            lblStatB.Text      = $"Cells from {_modBName}: {_mergeResult.TotalCellsFromB}";
-            lblStatB.ForeColor = Styling.ModBColor;
+            lblStatA.Text = $"Cells from {_modAName}: {_mergeResult.TotalCellsFromA}";
+            lblStatB.Text = $"Cells from {_modBName}: {_mergeResult.TotalCellsFromB}";
 
             if (_mergeResult.TotalConflicts == 0)
             {
-                lblConflicts.Text      = "✓ No conflicts — both mods change different things";
+                lblConflicts.Text = "✓ No conflicts — both mods change different things.";
                 lblConflicts.ForeColor = Styling.TextSuccess;
             }
             else
             {
                 lblConflicts.Text =
                     $"⚠ {_mergeResult.TotalConflicts} conflict(s) resolved — " +
-                    $"{_mergeResult.ResolvedConflicts.Count(c => c.ResolvedBy == _modAName)} " +
-                    $"won by {_modAName}, " +
-                    $"{_mergeResult.ResolvedConflicts.Count(c => c.ResolvedBy == _modBName)} " +
-                    $"won by {_modBName}";
+                    $"{_mergeResult.ResolvedConflicts.Count(c => c.ResolvedBy == _modAName)} won by {_modAName}, " +
+                    $"{_mergeResult.ResolvedConflicts.Count(c => c.ResolvedBy == _modBName)} won by {_modBName}";
                 lblConflicts.ForeColor = Styling.TextWarning;
             }
+
+            lblOutputPath.Text =
+                $"Output:\n{_finalOutputPath}";
 
             // ── Delete section ────────────────────────────────────────────────
             chkKeepFiles.Checked = _settings.KeepModFilesAfterMerge;
@@ -96,29 +84,26 @@ namespace SekiroParamMerger.WinForms
             string modBParamFolder = GetParamFolder(_modBPath);
 
             lblDeleteInfo.Text =
-                $"After saving, the tool can delete the individual mod param folders\n" +
-                $"to prevent conflicts with the new merged file:\n\n" +
-                $"  • {modAParamFolder}\n" +
-                $"  • {modBParamFolder}\n\n" +
+                $"After saving, the tool can delete each mod's whole param folder to\n" +
+                $"prevent conflicts with the new merged file:\n\n" +
+                $"   • {modAParamFolder}\n" +
+                $"   • {modBParamFolder}\n\n" +
                 $"Uncheck the box below to keep them instead.";
-            lblDeleteInfo.ForeColor = Styling.TextSecondary;
         }
 
         private async void btnSave_Click(object sender, EventArgs e)
         {
             btnSave.Enabled  = false;
             btnClose.Enabled = false;
-            lblSaveStatus.Text = "Saving...";
+            lblSaveStatus.Text = "Saving…";
             lblSaveStatus.ForeColor = Styling.TextWarning;
 
             try
             {
                 await Task.Run(() =>
                 {
-                    // ── Apply conflict resolutions to merged param bytes ───────
                     ApplyConflictResolutions();
 
-                    // ── Write the merged file ─────────────────────────────────
                     var writer = new ParamWriter();
                     writer.Write(_vanillaPath, _mergeResult, _finalOutputPath);
                 });
@@ -126,13 +111,9 @@ namespace SekiroParamMerger.WinForms
                 lblSaveStatus.Text      = $"✓ Saved to: {_finalOutputPath}";
                 lblSaveStatus.ForeColor = Styling.TextSuccess;
 
-                // ── Handle deletion ───────────────────────────────────────────
                 if (!chkKeepFiles.Checked)
-                {
                     await DeleteModParamFoldersAsync();
-                }
 
-                // ── Final success message ─────────────────────────────────────
                 string message =
                     $"Merge complete!\n\n" +
                     $"Saved to:\n{_finalOutputPath}\n\n" +
@@ -145,7 +126,6 @@ namespace SekiroParamMerger.WinForms
                     "\nThe merged file is ready — launch Sekiro with Mod Engine!";
 
                 MessageBox.Show(message, "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 btnClose.Enabled = true;
             }
             catch (Exception ex)
@@ -162,10 +142,9 @@ namespace SekiroParamMerger.WinForms
 
         private void ApplyConflictResolutions()
         {
-            // Re-apply all user-chosen conflict resolutions to the merged param bytes
-            // For now the MergeResult already has the right bytes from Phase 3 logic
-            // In a future version this is where we'd re-run the write with chosen values
-            // The conflict items already have ResolvedValue set by ConflictResolverForm
+            // ConflictItems already carry the user-chosen ResolvedValue set by
+            // ConflictResolverForm, and ParamMerger baked those values into
+            // MergeResult.MergedParamBytes. Nothing further to do here.
         }
 
         private async Task DeleteModParamFoldersAsync()
@@ -178,12 +157,8 @@ namespace SekiroParamMerger.WinForms
 
             await Task.Run(() =>
             {
-                // Delete Mod A's param folder
                 TryDeleteFolder(modAParamFolder, deletedFolders, failedFolders);
-
-                // Delete Mod B's param folder (only if different from Mod A)
-                if (!string.Equals(modAParamFolder, modBParamFolder,
-                    StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(modAParamFolder, modBParamFolder, StringComparison.OrdinalIgnoreCase))
                     TryDeleteFolder(modBParamFolder, deletedFolders, failedFolders);
             });
 
@@ -214,14 +189,11 @@ namespace SekiroParamMerger.WinForms
         }
 
         /// <summary>
-        /// Gets the 'param' folder containing a gameparam.parambnd.dcx file.
-        /// e.g. C:\mods\SomeMod\param\gameparam\gameparam.parambnd.dcx
-        ///   → C:\mods\SomeMod\param
+        /// ...\SomeMod\param\gameparam\gameparam.parambnd.dcx  →  ...\SomeMod\param
         /// We delete the whole \param\ folder and everything inside it.
         /// </summary>
         private static string GetParamFolder(string paramFilePath)
         {
-            // Go up: gameparam.parambnd.dcx → gameparam → param
             string? gameparamDir = Path.GetDirectoryName(paramFilePath);
             string? paramDir     = Path.GetDirectoryName(gameparamDir);
             return paramDir ?? string.Empty;

@@ -12,169 +12,137 @@ namespace SekiroParamMerger.WinForms
 
         private void InitializeComponent()
         {
-            lblConflictTitle   = new Label();
-            lblProgress        = new Label();
-            lblSummary         = new Label();
-            pnlInfo            = new Panel();
-            lblCategory        = new Label();
-            lblFieldLabel      = new Label();
-            lblTechnical       = new Label();
-            lblPaddingWarning  = new Label();
-            pnlValues          = new Panel();
-            lblVanillaValue    = new Label();
-            lblModAValue       = new Label();
-            lblModAChange      = new Label();
-            lblModBValue       = new Label();
-            lblModBChange      = new Label();
-            lblCurrentChoice   = new Label();
-            btnUseModA         = new Button();
-            btnUseModB         = new Button();
-            pnlNav             = new Panel();
-            btnPrevious        = new Button();
-            btnSkip            = new Button();
-            btnNext            = new Button();
-            btnAllModA         = new Button();
-            btnAllModB         = new Button();
-            btnDone            = new Button();
+            // ── Title bar ───────────────────────────────────────────────────
+            titleBar = new AppTitleBar { Heading = "CONFLICT RESOLVER" };
+            titleBar.Location = new Point(0, 0);
+            titleBar.Size = new Size(820, Styling.TitleBarHeight);
+            titleBar.CloseClicked += (_, _) => Close();
 
-            SuspendLayout();
+            lblProgress = new Label { Location = new Point(18, 62), AutoSize = true, ForeColor = Styling.TextSecondary, Font = Styling.FontMedium, BackColor = Styling.BackgroundDark };
+            lblSummary  = new Label { Location = new Point(18, 88), AutoSize = true, ForeColor = Styling.TextSecondary, Font = Styling.FontSmall, BackColor = Styling.BackgroundDark };
 
-            // ── Title row ─────────────────────────────────────────────────────
-            lblConflictTitle.Text      = "⚔  CONFLICT RESOLVER";
-            lblConflictTitle.Location  = new Point(16, 14);
-            lblConflictTitle.AutoSize  = true;
+            // ══ Info card ══════════════════════════════════════════════════
+            pnlInfo = new RoundedPanel { Location = new Point(18, 114), Size = new Size(784, 140) };
 
-            lblProgress.Text     = "";
-            lblProgress.Location = new Point(16, 44);
-            lblProgress.AutoSize = true;
-
-            lblSummary.Text     = "";
-            lblSummary.Location = new Point(16, 62);
-            lblSummary.AutoSize = true;
-
-            // ── Info Panel ────────────────────────────────────────────────────
-            pnlInfo.Location = new Point(12, 88);
-            pnlInfo.Size     = new Size(660, 120);
-            pnlInfo.Padding  = new Padding(12);
-
-            lblCategory.Text     = "";
-            lblCategory.Location = new Point(12, 10);
-            lblCategory.AutoSize = true;
-
-            lblFieldLabel.Text     = "";
-            lblFieldLabel.Location = new Point(12, 36);
-            lblFieldLabel.AutoSize = true;
+            lblCategory = MakeHeader("", new Point(14, 10));
+            lblFieldLabel = MakeHeader("", new Point(14, 42));
             lblFieldLabel.ForeColor = Styling.TextPrimary;
+            lblFieldLabel.Font = Styling.FontNormal;
 
-            lblTechnical.Text     = "";
-            lblTechnical.Location = new Point(12, 62);
-            lblTechnical.AutoSize = true;
-            lblTechnical.Font = Styling.FontSmall;
+            lblTechnical = MakeSecondary("", new Point(14, 70));
+            lblTechnical.Size = new Size(756, 18);
+            lblTechnical.Font = Styling.FontMono;
 
-            lblPaddingWarning.Text     = "";
-            lblPaddingWarning.Location = new Point(12, 82);
-            lblPaddingWarning.Size     = new Size(636, 30);
+            lblPaddingWarning = MakeSecondary("", new Point(14, 92));
+            lblPaddingWarning.Size = new Size(756, 40);
             lblPaddingWarning.ForeColor = Styling.TextWarning;
-            lblPaddingWarning.Font = Styling.FontSmall;
 
-            pnlInfo.Controls.AddRange(new Control[]
-            { lblCategory, lblFieldLabel, lblTechnical, lblPaddingWarning });
+            pnlInfo.Controls.AddRange(new Control[] { lblCategory, lblFieldLabel, lblTechnical, lblPaddingWarning });
 
-            // ── Values Panel ──────────────────────────────────────────────────
-            pnlValues.Location = new Point(12, 218);
-            pnlValues.Size     = new Size(660, 160);
-            pnlValues.Padding  = new Padding(12);
+            // ══ Values card ════════════════════════════════════════════════
+            pnlValues = new RoundedPanel { Location = new Point(18, 266), Size = new Size(784, 172) };
 
-            lblVanillaValue.Text     = "";
-            lblVanillaValue.Location = new Point(12, 10);
-            lblVanillaValue.AutoSize = true;
-            lblVanillaValue.ForeColor = Styling.TextSecondary;
+            lblVanillaValue = MakeSecondary("", new Point(14, 10));
 
-            lblModAValue.Text     = "";
-            lblModAValue.Location = new Point(12, 40);
-            lblModAValue.AutoSize = true;
+            lblModAValue = MakeHeader("", new Point(14, 42));
             lblModAValue.ForeColor = Styling.ModAColor;
-            lblModAValue.Font = Styling.FontMedium;
+            lblModAChange = new Label { Location = new Point(14, 66), AutoSize = true, ForeColor = Styling.ModAColor, Font = Styling.FontNormal, BackColor = Styling.BackgroundMid };
 
-            lblModAChange.Text     = "";
-            lblModAChange.Location = new Point(12, 62);
-            lblModAChange.AutoSize = true;
-
-            lblModBValue.Text     = "";
-            lblModBValue.Location = new Point(12, 92);
-            lblModBValue.AutoSize = true;
+            lblModBValue = MakeHeader("", new Point(14, 100));
             lblModBValue.ForeColor = Styling.ModBColor;
-            lblModBValue.Font = Styling.FontMedium;
+            lblModBChange = new Label { Location = new Point(14, 124), AutoSize = true, ForeColor = Styling.ModBColor, Font = Styling.FontNormal, BackColor = Styling.BackgroundMid };
 
-            lblModBChange.Text     = "";
-            lblModBChange.Location = new Point(12, 114);
-            lblModBChange.AutoSize = true;
-
-            lblCurrentChoice.Text     = "";
-            lblCurrentChoice.Location = new Point(12, 140);
-            lblCurrentChoice.AutoSize = true;
+            lblCurrentChoice = MakeSecondary("", new Point(14, 150));
             lblCurrentChoice.Font = Styling.FontSmall;
 
-            pnlValues.Controls.AddRange(new Control[]
+            pnlValues.Controls.AddRange(new Control[] { lblVanillaValue, lblModAValue, lblModAChange, lblModBValue, lblModBChange, lblCurrentChoice });
+
+            // ══ Choice buttons ═════════════════════════════════════════════
+            btnUseModA = new ModernButton
             {
-                lblVanillaValue,
-                lblModAValue, lblModAChange,
-                lblModBValue, lblModBChange,
-                lblCurrentChoice
-            });
+                Location = new Point(18, 450),
+                Size = new Size(384, 42),
+                BaseColor = Styling.ModAColor,
+                HoverColor = Color.FromArgb(90, 165, 245),
+                BorderColor = Styling.ModAColor,
+                TextColor = Color.White,
+                Font = Styling.FontMedium,
+                CornerRadius = 10
+            };
+            btnUseModA.Click += btnUseModA_Click;
 
-            // ── Choice Buttons ────────────────────────────────────────────────
-            btnUseModA.Text     = "";
-            btnUseModA.Location = new Point(12, 390);
-            btnUseModA.Size     = new Size(318, 36);
-            btnUseModA.Click   += btnUseModA_Click;
+            btnUseModB = new ModernButton
+            {
+                Location = new Point(418, 450),
+                Size = new Size(384, 42),
+                BaseColor = Styling.ModBColor,
+                HoverColor = Color.FromArgb(110, 220, 155),
+                BorderColor = Styling.ModBColor,
+                TextColor = Color.White,
+                Font = Styling.FontMedium,
+                CornerRadius = 10
+            };
+            btnUseModB.Click += btnUseModB_Click;
 
-            btnUseModB.Text     = "";
-            btnUseModB.Location = new Point(342, 390);
-            btnUseModB.Size     = new Size(318, 36);
-            btnUseModB.Click   += btnUseModB_Click;
+            // ══ Nav panel ══════════════════════════════════════════════════
+            pnlNav = new RoundedPanel { Location = new Point(18, 504), Size = new Size(784, 50) };
 
-            // ── Nav Panel ─────────────────────────────────────────────────────
-            pnlNav.Location = new Point(12, 438);
-            pnlNav.Size     = new Size(660, 44);
+            btnPrevious = MakeNavButton("◀ Previous", new Point(14, 10), 110);
+            btnPrevious.Click += btnPrevious_Click;
 
-            btnPrevious.Text     = "◀ Previous";
-            btnPrevious.Location = new Point(0, 8);
-            btnPrevious.Size     = new Size(100, 28);
-            btnPrevious.Click   += btnPrevious_Click;
+            btnSkip = MakeNavButton("Skip", new Point(132, 10), 76);
+            btnSkip.Click += btnSkip_Click;
 
-            btnSkip.Text     = "Skip";
-            btnSkip.Location = new Point(108, 8);
-            btnSkip.Size     = new Size(70, 28);
-            btnSkip.Click   += btnSkip_Click;
+            btnNext = MakeNavButton("Next ▶", new Point(216, 10), 110);
+            btnNext.Click += btnNext_Click;
 
-            btnNext.Text     = "Next ▶";
-            btnNext.Location = new Point(186, 8);
-            btnNext.Size     = new Size(100, 28);
-            btnNext.Click   += btnNext_Click;
+            btnAllModA = new ModernButton
+            {
+                Text = "Mod A wins ALL remaining",
+                Location = new Point(342, 10),
+                Size = new Size(214, 30),
+                BaseColor = Color.FromArgb(50, 80, 120),
+                HoverColor = Styling.ModAColor,
+                BorderColor = Styling.ModAColor,
+                TextColor = Styling.TextPrimary,
+                Font = Styling.FontSmall
+            };
+            btnAllModA.Click += btnAllModA_Click;
 
-            btnAllModA.Text     = "Mod A wins ALL remaining";
-            btnAllModA.Location = new Point(310, 8);
-            btnAllModA.Size     = new Size(170, 28);
-            btnAllModA.Click   += btnAllModA_Click;
+            btnAllModB = new ModernButton
+            {
+                Text = "Mod B wins ALL remaining",
+                Location = new Point(564, 10),
+                Size = new Size(206, 30),
+                BaseColor = Color.FromArgb(50, 100, 80),
+                HoverColor = Styling.ModBColor,
+                BorderColor = Styling.ModBColor,
+                TextColor = Styling.TextPrimary,
+                Font = Styling.FontSmall
+            };
+            btnAllModB.Click += btnAllModB_Click;
 
-            btnAllModB.Text     = "Mod B wins ALL remaining";
-            btnAllModB.Location = new Point(488, 8);
-            btnAllModB.Size     = new Size(170, 28);
-            btnAllModB.Click   += btnAllModB_Click;
+            pnlNav.Controls.AddRange(new Control[] { btnPrevious, btnSkip, btnNext, btnAllModA, btnAllModB });
 
-            pnlNav.Controls.AddRange(new Control[]
-            { btnPrevious, btnSkip, btnNext, btnAllModA, btnAllModB });
-
-            // ── Done Button ───────────────────────────────────────────────────
-            btnDone.Text     = "✓  DONE — Apply All Resolutions";
-            btnDone.Location = new Point(12, 492);
-            btnDone.Size     = new Size(660, 40);
-            btnDone.Click   += btnDone_Click;
+            // ══ Done button ════════════════════════════════════════════════
+            btnDone = new ModernButton
+            {
+                Text = "✓  DONE — APPLY ALL RESOLUTIONS",
+                Location = new Point(18, 566),
+                Size = new Size(784, 44),
+                BaseColor = Styling.AccentRed,
+                HoverColor = Styling.AccentRedLight,
+                BorderColor = Styling.AccentRed,
+                TextColor = Color.White,
+                Font = Styling.FontMedium,
+                CornerRadius = 12
+            };
+            btnDone.Click += btnDone_Click;
 
             Controls.AddRange(new Control[]
             {
-                lblConflictTitle, lblProgress, lblSummary,
+                titleBar,
+                lblProgress, lblSummary,
                 pnlInfo, pnlValues,
                 btnUseModA, btnUseModB,
                 pnlNav, btnDone
@@ -183,29 +151,49 @@ namespace SekiroParamMerger.WinForms
             ResumeLayout(false);
         }
 
-        private Label   lblConflictTitle;
-        private Label   lblProgress;
-        private Label   lblSummary;
-        private Panel   pnlInfo;
-        private Label   lblCategory;
-        private Label   lblFieldLabel;
-        private Label   lblTechnical;
-        private Label   lblPaddingWarning;
-        private Panel   pnlValues;
-        private Label   lblVanillaValue;
-        private Label   lblModAValue;
-        private Label   lblModAChange;
-        private Label   lblModBValue;
-        private Label   lblModBChange;
-        private Label   lblCurrentChoice;
-        private Button  btnUseModA;
-        private Button  btnUseModB;
-        private Panel   pnlNav;
-        private Button  btnPrevious;
-        private Button  btnSkip;
-        private Button  btnNext;
-        private Button  btnAllModA;
-        private Button  btnAllModB;
-        private Button  btnDone;
+        private static Label MakeHeader(string text, Point location)
+            => new Label { Text = text, Font = Styling.FontMedium, ForeColor = Styling.AccentGold, AutoSize = true, Location = location, BackColor = Styling.BackgroundMid };
+
+        private static Label MakeSecondary(string text, Point location)
+            => new Label { Text = text, Font = Styling.FontSmall, ForeColor = Styling.TextSecondary, AutoSize = true, Location = location, BackColor = Styling.BackgroundMid };
+
+        private static ModernButton MakeNavButton(string text, Point location, int width)
+            => new ModernButton
+            {
+                Text = text,
+                Location = location,
+                Size = new Size(width, 30),
+                BaseColor = Styling.BackgroundLight,
+                HoverColor = Styling.ButtonHover,
+                BorderColor = Styling.BorderColor,
+                TextColor = Styling.TextPrimary,
+                Font = Styling.FontSmall
+            };
+
+        // ── Control declarations ────────────────────────────────────────────
+        private AppTitleBar   titleBar;
+        private Label         lblProgress;
+        private Label         lblSummary;
+        private RoundedPanel  pnlInfo;
+        private Label         lblCategory;
+        private Label         lblFieldLabel;
+        private Label         lblTechnical;
+        private Label         lblPaddingWarning;
+        private RoundedPanel  pnlValues;
+        private Label         lblVanillaValue;
+        private Label         lblModAValue;
+        private Label         lblModAChange;
+        private Label         lblModBValue;
+        private Label         lblModBChange;
+        private Label         lblCurrentChoice;
+        private ModernButton  btnUseModA;
+        private ModernButton  btnUseModB;
+        private RoundedPanel  pnlNav;
+        private ModernButton  btnPrevious;
+        private ModernButton  btnSkip;
+        private ModernButton  btnNext;
+        private ModernButton  btnAllModA;
+        private ModernButton  btnAllModB;
+        private ModernButton  btnDone;
     }
 }

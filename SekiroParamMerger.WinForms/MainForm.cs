@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using SekiroParamMerger.Core;
 using SekiroParamMerger.Core.Models;
 
@@ -5,7 +6,7 @@ namespace SekiroParamMerger.WinForms
 {
     public partial class MainForm : Form
     {
-        private AppSettings _settings;
+        private readonly AppSettings _settings;
         private ParamLoader? _loader;
 
         // ── State ─────────────────────────────────────────────────────────────
@@ -13,6 +14,14 @@ namespace SekiroParamMerger.WinForms
         private string _modAName = string.Empty;
         private string _modBPath = string.Empty;
         private string _modBName = string.Empty;
+
+        // ── Tray ──────────────────────────────────────────────────────────────
+        private NotifyIcon? _trayIcon;
+        private bool _exiting;
+
+        // ── Progress ──────────────────────────────────────────────────────────
+        private readonly Stopwatch _stopwatch = new();
+        private int _totalSteps = 5;
 
         public MainForm()
         {
@@ -29,60 +38,28 @@ namespace SekiroParamMerger.WinForms
         {
             Styling.ApplyDarkTheme(this);
             this.Text = "Sekiro Param Merger";
-            this.MinimumSize = new Size(780, 620);
-            this.Size = new Size(780, 660);
+            this.Icon = AppIcon.Create();
+            this.ClientSize = new Size(1000, 760);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.Sizable;
-            this.Icon = SystemIcons.Application;
-
-            Styling.StyleHeader(lblTitle);
-            Styling.StyleHeader(lblGameSection);
-            Styling.StyleHeader(lblModASection);
-            Styling.StyleHeader(lblModBSection);
-            Styling.StyleHeader(lblOutputSection);
-
-            Styling.StyleSecondary(lblVanillaStatus);
-            Styling.StyleSecondary(lblGameFolderHint);
-            Styling.StyleSecondary(lblOutputHint);
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
 
             Styling.StyleTextBox(txtGameFolder);
-            Styling.StyleTextBox(txtModAPath);
             Styling.StyleTextBox(txtModAName);
-            Styling.StyleTextBox(txtModBPath);
+            Styling.StyleTextBox(txtModAPath);
             Styling.StyleTextBox(txtModBName);
+            Styling.StyleTextBox(txtModBPath);
             Styling.StyleTextBox(txtOutputFolder);
 
-            Styling.StyleButton(btnBrowseGame);
-            Styling.StyleButton(btnBrowseModA);
-            Styling.StyleButton(btnBrowseModB);
-            Styling.StyleButton(btnBrowseOutput);
-            Styling.StyleButton(btnMerge, isPrimary: true);
-
-            Styling.StyleCheckBox(chkKeepModFiles);
-            Styling.StyleCard(pnlGame);
-            Styling.StyleCard(pnlModA);
-            Styling.StyleCard(pnlModB);
-            Styling.StyleCard(pnlOutput);
-            Styling.StyleCard(pnlStatus);
-
-            // Mod A accent
-            lblModASection.ForeColor = Styling.ModAColor;
-            lblModAPriority.ForeColor = Styling.ModAColor;
-            lblModAPriority.Font = Styling.FontSmall;
-
-            // Mod B accent
-            lblModBSection.ForeColor = Styling.ModBColor;
-
-            // Merge button — make it prominent
-            btnMerge.Height = 48;
-            btnMerge.Font = Styling.FontMedium;
+            this.Shown += (_, _) => Styling.MakeWindowRounded(this, 20);
         }
 
         // ── Settings ──────────────────────────────────────────────────────────
 
         private void LoadSettings()
         {
-            txtGameFolder.Text  = _settings.GameFolderPath;
+            txtGameFolder.Text   = _settings.GameFolderPath;
             txtOutputFolder.Text = _settings.OutputFolderPath;
             chkKeepModFiles.Checked = _settings.KeepModFilesAfterMerge;
             UpdateVanillaStatus();
@@ -90,8 +67,8 @@ namespace SekiroParamMerger.WinForms
 
         private void SaveSettings()
         {
-            _settings.GameFolderPath        = txtGameFolder.Text.Trim();
-            _settings.OutputFolderPath      = txtOutputFolder.Text.Trim();
+            _settings.GameFolderPath         = txtGameFolder.Text.Trim();
+            _settings.OutputFolderPath       = txtOutputFolder.Text.Trim();
             _settings.KeepModFilesAfterMerge = chkKeepModFiles.Checked;
             _settings.Save();
         }
@@ -102,8 +79,7 @@ namespace SekiroParamMerger.WinForms
         {
             if (_settings.IsFirstRun)
             {
-                lblStatus.Text = "Welcome! Please select your Sekiro game folder to get started.";
-                lblStatus.ForeColor = Styling.TextWarning;
+                SetStatus("Welcome! Select your Sekiro game folder to get started.", Styling.TextWarning);
                 txtGameFolder.Focus();
             }
             else
@@ -132,31 +108,33 @@ namespace SekiroParamMerger.WinForms
         {
             if (string.IsNullOrWhiteSpace(_settings.GameFolderPath))
             {
-                lblVanillaStatus.Text = "No game folder selected";
-                lblVanillaStatus.ForeColor = Styling.TextSecondary;
+                SetVanillaStatus("No game folder selected", Styling.TextSecondary);
                 return;
             }
 
             if (!_settings.ParamFolderExists)
             {
-                lblVanillaStatus.Text =
-                    "⚠ Game files not unpacked! You need to run UXM Selective Unpacker first.\n" +
-                    "Download from: github.com/Nordgaren/UXM-Selective-Unpack/releases\n" +
-                    "Point it to sekiro.exe and click Unpack.";
-                lblVanillaStatus.ForeColor = Styling.TextWarning;
+                SetVanillaStatus(
+                    "⚠ Game files not unpacked — run UXM Selective Unpacker first.\n" +
+                    "   github.com/Nordgaren/UXM-Selective-Unpack/releases  →  Point at sekiro.exe → Unpack.",
+                    Styling.TextWarning);
             }
             else if (!_settings.VanillaFileExists)
             {
-                lblVanillaStatus.Text =
-                    "⚠ param\\gameparam folder found but gameparam.parambnd.dcx is missing.\n" +
-                    "Please run UXM Unpack again to restore the vanilla param file.";
-                lblVanillaStatus.ForeColor = Styling.TextWarning;
+                SetVanillaStatus(
+                    "⚠ param\\gameparam found but gameparam.parambnd.dcx is missing — run UXM Unpack again.",
+                    Styling.TextWarning);
             }
             else
             {
-                lblVanillaStatus.Text = $"✓ Vanilla file found: {_settings.VanillaParamPath}";
-                lblVanillaStatus.ForeColor = Styling.TextSuccess;
+                SetVanillaStatus($"✓ Vanilla file found: {_settings.VanillaParamPath}", Styling.TextSuccess);
             }
+        }
+
+        private void SetVanillaStatus(string text, Color color)
+        {
+            lblVanillaStatus.Text = text;
+            lblVanillaStatus.ForeColor = color;
         }
 
         // ── Browse Buttons ────────────────────────────────────────────────────
@@ -177,12 +155,10 @@ namespace SekiroParamMerger.WinForms
 
             string folder = dialog.SelectedPath;
 
-            // Validate: must contain sekiro.exe
             if (!File.Exists(Path.Combine(folder, "sekiro.exe")))
             {
                 MessageBox.Show(
-                    "The selected folder does not contain sekiro.exe.\n\n" +
-                    "Please select the correct Sekiro game folder.",
+                    "The selected folder does not contain sekiro.exe.\n\nPlease select the correct Sekiro game folder.",
                     "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -190,7 +166,6 @@ namespace SekiroParamMerger.WinForms
             txtGameFolder.Text = folder;
             _settings.GameFolderPath = folder;
 
-            // Set default output to mods folder if it exists
             string modsFolder = Path.Combine(folder, "mods");
             if (Directory.Exists(modsFolder) && string.IsNullOrWhiteSpace(_settings.OutputFolderPath))
             {
@@ -212,13 +187,8 @@ namespace SekiroParamMerger.WinForms
             _modAPath = path;
             txtModAPath.Text = path;
 
-            // Auto-suggest name from folder path
             if (string.IsNullOrWhiteSpace(txtModAName.Text))
-            {
-                string? parent = Path.GetFileName(Path.GetDirectoryName(
-                    Path.GetDirectoryName(Path.GetDirectoryName(path))));
-                txtModAName.Text = parent ?? "Mod A";
-            }
+                txtModAName.Text = SuggestModName(path) ?? "Mod A";
 
             SetStatus("Mod A selected.", Styling.TextSuccess);
             UpdateMergeButtonState();
@@ -233,14 +203,21 @@ namespace SekiroParamMerger.WinForms
             txtModBPath.Text = path;
 
             if (string.IsNullOrWhiteSpace(txtModBName.Text))
-            {
-                string? parent = Path.GetFileName(Path.GetDirectoryName(
-                    Path.GetDirectoryName(Path.GetDirectoryName(path))));
-                txtModBName.Text = parent ?? "Mod B";
-            }
+                txtModBName.Text = SuggestModName(path) ?? "Mod B";
 
             SetStatus("Mod B selected.", Styling.TextSuccess);
             UpdateMergeButtonState();
+        }
+
+        private static string? SuggestModName(string path)
+        {
+            try
+            {
+                // ...\ModName\param\gameparam\gameparam.parambnd.dcx  →  ModName
+                return Path.GetFileName(Path.GetDirectoryName(
+                    Path.GetDirectoryName(Path.GetDirectoryName(path))));
+            }
+            catch { return null; }
         }
 
         private void btnBrowseOutput_Click(object sender, EventArgs e)
@@ -270,7 +247,6 @@ namespace SekiroParamMerger.WinForms
                 FileName = "gameparam.parambnd.dcx"
             };
 
-            // Try to start in game mods folder
             if (!string.IsNullOrWhiteSpace(_settings.GameFolderPath))
             {
                 string modsParam = Path.Combine(_settings.GameFolderPath, "mods");
@@ -298,33 +274,17 @@ namespace SekiroParamMerger.WinForms
 
         private async void btnMerge_Click(object sender, EventArgs e)
         {
-            // ── Validate all inputs ───────────────────────────────────────────
             string modAName = string.IsNullOrWhiteSpace(txtModAName.Text) ? "Mod A" : txtModAName.Text.Trim();
             string modBName = string.IsNullOrWhiteSpace(txtModBName.Text) ? "Mod B" : txtModBName.Text.Trim();
 
-            if (!File.Exists(_modAPath))
-            {
-                ShowError($"Mod A file not found:\n{_modAPath}");
-                return;
-            }
-
-            if (!File.Exists(_modBPath))
-            {
-                ShowError($"Mod B file not found:\n{_modBPath}");
-                return;
-            }
-
-            if (!Directory.Exists(txtOutputFolder.Text.Trim()))
-            {
-                ShowError($"Output folder does not exist:\n{txtOutputFolder.Text}");
-                return;
-            }
+            if (!File.Exists(_modAPath)) { ShowError($"Mod A file not found:\n{_modAPath}"); return; }
+            if (!File.Exists(_modBPath)) { ShowError($"Mod B file not found:\n{_modBPath}"); return; }
+            if (!Directory.Exists(txtOutputFolder.Text.Trim())) { ShowError($"Output folder does not exist:\n{txtOutputFolder.Text}"); return; }
 
             SaveSettings();
 
-            // ── Disable UI during merge ───────────────────────────────────────
             SetFormEnabled(false);
-            SetStatus("Loading param files...", Styling.TextWarning);
+            SetLoading(true);
 
             try
             {
@@ -336,6 +296,7 @@ namespace SekiroParamMerger.WinForms
             }
             finally
             {
+                SetLoading(false);
                 SetFormEnabled(true);
             }
         }
@@ -354,33 +315,34 @@ namespace SekiroParamMerger.WinForms
             DiffResult diffB = null!;
             MergeResult mergeResult = null!;
 
-            // ── Load all three files ──────────────────────────────────────────
+            int step = 0;
+            _stopwatch.Restart();
+            _totalSteps = 5;
+
             await Task.Run(() =>
             {
-                SetStatus("Loading vanilla file...", Styling.TextWarning);
+                UpdateProgress(step++, _totalSteps, "Loading vanilla file…");
+
                 vanillaBundle = _loader!.LoadParamBundle(vanillaPath);
 
-                SetStatus($"Loading {modAName}...", Styling.TextWarning);
+                UpdateProgress(step++, _totalSteps, $"Loading {modAName}…");
                 modABundle = _loader.LoadParamBundle(modAPath);
 
-                SetStatus($"Loading {modBName}...", Styling.TextWarning);
+                UpdateProgress(step++, _totalSteps, $"Loading {modBName}…");
                 modBBundle = _loader.LoadParamBundle(modBPath);
 
-                // ── Diff both against vanilla ─────────────────────────────────
-                SetStatus("Analysing differences...", Styling.TextWarning);
+                UpdateProgress(step++, _totalSteps, "Analysing differences…");
                 var differ = new ParamDiffer();
                 diffA = differ.Diff(vanillaBundle, modABundle, modAName);
                 diffB = differ.Diff(vanillaBundle, modBBundle, modBName);
 
-                // ── Merge ─────────────────────────────────────────────────────
-                SetStatus("Merging at cell level...", Styling.TextWarning);
+                UpdateProgress(step++, _totalSteps, "Merging at cell level…");
                 var merger = new ParamMerger(_loader.Paramdefs);
                 mergeResult = merger.Merge(vanillaBundle, modABundle, diffA, modBBundle, diffB);
             });
 
-            SetStatus("Merge complete. Reviewing conflicts...", Styling.TextSuccess);
+            UpdateProgress(_totalSteps, _totalSteps, "Merge complete — reviewing conflicts…", final: true);
 
-            // ── Show conflict resolver if there are conflicts ─────────────────
             if (mergeResult.ResolvedConflicts.Count > 0)
             {
                 using var conflictForm = new ConflictResolverForm(mergeResult, modAName, modBName);
@@ -389,10 +351,8 @@ namespace SekiroParamMerger.WinForms
                     SetStatus("Merge cancelled during conflict resolution.", Styling.TextSecondary);
                     return;
                 }
-                // Conflict resolutions are applied inside ConflictResolverForm
             }
 
-            // ── Show post-merge form ──────────────────────────────────────────
             using var postForm = new PostMergeForm(
                 mergeResult, vanillaPath, outputFolder,
                 modAPath, modBPath,
@@ -401,7 +361,6 @@ namespace SekiroParamMerger.WinForms
 
             postForm.ShowDialog(this);
 
-            // ── Clear mod paths ───────────────────────────────────────────────
             _modAPath = string.Empty;
             _modBPath = string.Empty;
             txtModAPath.Text = string.Empty;
@@ -412,15 +371,67 @@ namespace SekiroParamMerger.WinForms
             UpdateMergeButtonState();
         }
 
+        // ── Loading / Progress ────────────────────────────────────────────────
+
+        private void SetLoading(bool loading)
+        {
+            if (InvokeRequired) { Invoke(() => SetLoading(loading)); return; }
+
+            pnlProgress.Visible = loading;
+            if (loading)
+            {
+                progressBar.IsIndeterminate = false;
+                progressBar.SetValue(0);
+                lblProgressText.Text = "Preparing…";
+                lblEta.Text = "";
+                _stopwatch.Reset();
+            }
+            else
+            {
+                progressBar.IsIndeterminate = false;
+                _stopwatch.Stop();
+            }
+        }
+
+        private void UpdateProgress(int stepsDone, int totalSteps, string message, bool final = false)
+        {
+            if (InvokeRequired) { Invoke(() => UpdateProgress(stepsDone, totalSteps, message, final)); return; }
+
+            double fraction = totalSteps <= 0 ? 1.0 : (double)stepsDone / totalSteps;
+            int percent = (int)Math.Round(fraction * 100);
+
+            progressBar.IsIndeterminate = false;
+            progressBar.SetValue(percent);
+            lblProgressText.Text = message;
+
+            if (final)
+            {
+                lblEta.Text = "Done";
+                lblProgressText.ForeColor = Styling.TextSuccess;
+            }
+            else
+            {
+                // ETA estimate based on elapsed time vs fraction done
+                long elapsedMs = Math.Max(1, _stopwatch.ElapsedMilliseconds);
+                double etaMs = fraction > 0.001
+                    ? (elapsedMs / fraction) - elapsedMs
+                    : 0;
+                lblEta.Text = etaMs > 0 ? $"ETA {FormatEta(etaMs)}" : "…";
+            }
+        }
+
+        private static string FormatEta(double ms)
+        {
+            var ts = TimeSpan.FromMilliseconds(ms);
+            if (ts.TotalSeconds < 60) return $"{Math.Max(0, (int)ts.TotalSeconds)}s";
+            return $"{(int)ts.TotalMinutes}m {Math.Max(0, ts.Seconds)}s";
+        }
+
         // ── Helpers ───────────────────────────────────────────────────────────
 
         private void SetStatus(string message, Color color)
         {
-            if (InvokeRequired)
-            {
-                Invoke(() => SetStatus(message, color));
-                return;
-            }
+            if (InvokeRequired) { Invoke(() => SetStatus(message, color)); return; }
             lblStatus.Text = message;
             lblStatus.ForeColor = color;
         }
@@ -428,7 +439,10 @@ namespace SekiroParamMerger.WinForms
         private void SetFormEnabled(bool enabled)
         {
             if (InvokeRequired) { Invoke(() => SetFormEnabled(enabled)); return; }
-            btnMerge.Enabled        = enabled;
+            btnMerge.Enabled        = enabled && _loader != null && _settings.VanillaFileExists
+                                      && !string.IsNullOrWhiteSpace(_modAPath)
+                                      && !string.IsNullOrWhiteSpace(_modBPath)
+                                      && !string.IsNullOrWhiteSpace(txtOutputFolder.Text);
             btnBrowseModA.Enabled   = enabled;
             btnBrowseModB.Enabled   = enabled;
             btnBrowseGame.Enabled   = enabled;
@@ -441,11 +455,106 @@ namespace SekiroParamMerger.WinForms
             SetStatus("Error — see dialog.", Styling.TextDanger);
         }
 
+        // ── Tray (minimize to hidden icons, CTk-style) ────────────────────────
+
+        private void SetupTray()
+        {
+            _trayIcon = new NotifyIcon
+            {
+                Icon = AppIcon.Create(),
+                Text = "Sekiro Param Merger",
+                Visible = true
+            };
+
+            var menu = new ContextMenuStrip();
+            menu.BackColor = Styling.BackgroundMid;
+            menu.ForeColor = Styling.TextPrimary;
+            menu.Renderer = new ToolStripProfessionalRenderer(new TrayColorTable());
+
+            menu.Items.Add("Show", null, (_, _) => ShowFromTray());
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add("Exit", null, (_, _) => ExitApplication());
+
+            _trayIcon.ContextMenuStrip = menu;
+            _trayIcon.DoubleClick += (_, _) => ShowFromTray();
+        }
+
+        private void MinimizeToTray()
+        {
+            Hide();
+            ShowFromTrayIfFirstTime();
+        }
+
+        private bool _trayBalloonShown;
+        private void ShowFromTrayIfFirstTime()
+        {
+            if (_trayBalloonShown) return;
+            _trayBalloonShown = true;
+            _trayIcon?.ShowBalloonTip(2000, "Sekiro Param Merger",
+                "Still running — double-click the tray icon to reopen.", ToolTipIcon.Info);
+        }
+
+        private void ShowFromTray()
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            Activate();
+        }
+
+        private void ExitApplication()
+        {
+            _exiting = true;
+            _trayIcon?.Dispose();
+            _trayIcon = null;
+            Close();
+        }
+
+        private void btnCloseWindow_Click()
+        {
+            // CTk-style: closing the window exits the app (no maximize button).
+            ExitApplication();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!_exiting)
+            {
+                // The custom close button always exits; any other path (Alt+F4)
+                // minimizes to tray instead to avoid losing work.
+                e.Cancel = true;
+                MinimizeToTray();
+                return;
+            }
+            _trayIcon?.Dispose();
+            base.OnFormClosing(e);
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            SetupTray();
+        }
+
         private void chkKeepModFiles_CheckedChanged(object sender, EventArgs e) => SaveSettings();
+
         private void txtOutputFolder_TextChanged(object sender, EventArgs e)
         {
             SaveSettings();
             UpdateMergeButtonState();
         }
+    }
+
+    /// <summary>Colour table so the tray context menu matches the dark theme.</summary>
+    internal sealed class TrayColorTable : ProfessionalColorTable
+    {
+        public override Color ToolStripDropDownBackground => Styling.BackgroundMid;
+        public override Color MenuBorder => Styling.BorderColor;
+        public override Color MenuItemBorder => Styling.BorderColor;
+        public override Color MenuItemSelected => Styling.BackgroundLight;
+        public override Color ImageMarginGradientBegin => Styling.BackgroundMid;
+        public override Color ImageMarginGradientMiddle => Styling.BackgroundMid;
+        public override Color ImageMarginGradientEnd => Styling.BackgroundMid;
+        public override Color SeparatorDark => Styling.BorderColor;
+        public override Color SeparatorLight => Styling.BackgroundMid;
     }
 }

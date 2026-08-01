@@ -12,85 +12,104 @@ namespace SekiroParamMerger.WinForms
 
         private void InitializeComponent()
         {
-            lblTitle      = new Label();
-            pnlSummary    = new Panel();
-            lblStatA      = new Label();
-            lblStatB      = new Label();
-            lblConflicts  = new Label();
-            lblOutputPath = new Label();
-            pnlDelete     = new Panel();
-            lblDeleteInfo = new Label();
-            chkKeepFiles  = new CheckBox();
-            lblSaveStatus = new Label();
-            btnSave       = new Button();
-            btnClose      = new Button();
+            // ── Title bar ───────────────────────────────────────────────────
+            titleBar = new AppTitleBar { Heading = "MERGE COMPLETE" };
+            titleBar.Location = new Point(0, 0);
+            titleBar.Size = new Size(760, Styling.TitleBarHeight);
+            titleBar.CloseClicked += (_, _) => Close();
 
-            SuspendLayout();
+            lblTitle = new Label
+            {
+                Text = "✓  MERGE COMPLETE — REVIEW & SAVE",
+                Font = Styling.FontAppTitle,
+                ForeColor = Styling.TextPrimary,
+                AutoSize = true,
+                Location = new Point(18, 62),
+                BackColor = Styling.BackgroundDark
+            };
 
-            // ── Title ─────────────────────────────────────────────────────────
-            lblTitle.Text     = "✓  MERGE COMPLETE — REVIEW & SAVE";
-            lblTitle.Location = new Point(16, 14);
-            lblTitle.AutoSize = true;
+            // ══ Summary card ═══════════════════════════════════════════════
+            pnlSummary = new RoundedPanel { Location = new Point(18, 118), Size = new Size(724, 156) };
 
-            // ── Summary Panel ─────────────────────────────────────────────────
-            pnlSummary.Location = new Point(12, 52);
-            pnlSummary.Size     = new Size(644, 120);
-            pnlSummary.Padding  = new Padding(12);
+            lblStatA = new Label { Location = new Point(14, 10), AutoSize = true, Font = Styling.FontMedium, ForeColor = Styling.ModAColor, BackColor = Styling.BackgroundMid };
+            lblStatB = new Label { Location = new Point(14, 38), AutoSize = true, Font = Styling.FontMedium, ForeColor = Styling.ModBColor, BackColor = Styling.BackgroundMid };
 
-            lblStatA.Location = new Point(12, 10);
-            lblStatA.AutoSize = true;
-            lblStatA.Font     = Styling.FontMedium;
+            lblConflicts = new Label { Location = new Point(14, 68), AutoSize = true, Font = Styling.FontNormal, ForeColor = Styling.TextPrimary, BackColor = Styling.BackgroundMid };
 
-            lblStatB.Location = new Point(12, 36);
-            lblStatB.AutoSize = true;
-            lblStatB.Font     = Styling.FontMedium;
+            lblOutputPath = new Label { Location = new Point(14, 100), Size = new Size(696, 44), Font = Styling.FontSmall, ForeColor = Styling.TextSecondary, BackColor = Styling.BackgroundMid };
 
-            lblConflicts.Location = new Point(12, 62);
-            lblConflicts.AutoSize = true;
+            pnlSummary.Controls.AddRange(new Control[] { lblStatA, lblStatB, lblConflicts, lblOutputPath });
 
-            lblOutputPath.Location = new Point(12, 94);
-            lblOutputPath.Size     = new Size(620, 18);
-            lblOutputPath.Font     = Styling.FontSmall;
+            // ══ Deletion card ══════════════════════════════════════════════
+            pnlDelete = new RoundedPanel { Location = new Point(18, 286), Size = new Size(724, 150) };
 
-            pnlSummary.Controls.AddRange(new Control[]
-            { lblStatA, lblStatB, lblConflicts, lblOutputPath });
+            lblDeleteTitle = new Label
+            {
+                Text = "🗑  AUTO-CLEANUP OF MOD PARAM FOLDERS",
+                Font = Styling.FontMedium,
+                ForeColor = Styling.AccentGold,
+                AutoSize = true,
+                Location = new Point(14, 10),
+                BackColor = Styling.BackgroundMid
+            };
 
-            // ── Delete Panel ──────────────────────────────────────────────────
-            pnlDelete.Location = new Point(12, 182);
-            pnlDelete.Size     = new Size(644, 160);
-            pnlDelete.Padding  = new Padding(12);
+            lblDeleteInfo = new Label { Location = new Point(14, 36), Size = new Size(696, 80), Font = Styling.FontSmall, ForeColor = Styling.TextSecondary, BackColor = Styling.BackgroundMid };
 
-            lblDeleteInfo.Location = new Point(12, 10);
-            lblDeleteInfo.Size     = new Size(620, 120);
-            lblDeleteInfo.Font     = Styling.FontSmall;
-
-            chkKeepFiles.Text     = "Keep Mod A and Mod B param files (do NOT delete them)";
-            chkKeepFiles.Location = new Point(12, 130);
-            chkKeepFiles.AutoSize = true;
+            chkKeepFiles = new CheckBox
+            {
+                Text = "Keep Mod A & B param folders (do NOT delete them)",
+                Location = new Point(14, 120),
+                AutoSize = true,
+                ForeColor = Styling.TextPrimary,
+                Font = Styling.FontSmall,
+                BackColor = Styling.BackgroundMid
+            };
             chkKeepFiles.CheckedChanged += chkKeepFiles_CheckedChanged;
 
-            pnlDelete.Controls.AddRange(new Control[]
-            { lblDeleteInfo, chkKeepFiles });
+            pnlDelete.Controls.AddRange(new Control[] { lblDeleteTitle, lblDeleteInfo, chkKeepFiles });
 
-            // ── Save Status ───────────────────────────────────────────────────
-            lblSaveStatus.Text     = "Ready to save.";
-            lblSaveStatus.Location = new Point(12, 352);
-            lblSaveStatus.Size     = new Size(644, 18);
-            lblSaveStatus.ForeColor = Styling.TextSecondary;
+            // ══ Save status ════════════════════════════════════════════════
+            lblSaveStatus = new Label
+            {
+                Text = "Ready to save.",
+                Location = new Point(18, 448),
+                Size = new Size(724, 20),
+                Font = Styling.FontSmall,
+                ForeColor = Styling.TextSecondary,
+                TextAlign = ContentAlignment.MiddleLeft,
+                BackColor = Styling.BackgroundDark
+            };
 
-            // ── Buttons ───────────────────────────────────────────────────────
-            btnSave.Text     = "💾  SAVE MERGED FILE";
-            btnSave.Location = new Point(12, 378);
-            btnSave.Size     = new Size(644, 44);
-            btnSave.Click   += btnSave_Click;
+            // ══ Buttons ════════════════════════════════════════════════════
+            btnSave = new ModernButton
+            {
+                Text = "💾  SAVE MERGED FILE",
+                Location = new Point(18, 476),
+                Size = new Size(724, 46),
+                BaseColor = Styling.AccentRed,
+                HoverColor = Styling.AccentRedLight,
+                BorderColor = Styling.AccentRed,
+                TextColor = Color.White,
+                Font = Styling.FontMedium,
+                CornerRadius = 12
+            };
+            btnSave.Click += btnSave_Click;
 
-            btnClose.Text     = "Close";
-            btnClose.Location = new Point(12, 430);
-            btnClose.Size     = new Size(644, 32);
-            btnClose.Click   += btnClose_Click;
+            btnClose = new ModernButton
+            {
+                Text = "Close",
+                Location = new Point(18, 530),
+                Size = new Size(724, 36),
+                BaseColor = Styling.BackgroundLight,
+                HoverColor = Styling.ButtonHover,
+                BorderColor = Styling.BorderColor,
+                TextColor = Styling.TextPrimary
+            };
+            btnClose.Click += btnClose_Click;
 
             Controls.AddRange(new Control[]
             {
+                titleBar,
                 lblTitle, pnlSummary, pnlDelete,
                 lblSaveStatus, btnSave, btnClose
             });
@@ -98,17 +117,20 @@ namespace SekiroParamMerger.WinForms
             ResumeLayout(false);
         }
 
-        private Label    lblTitle;
-        private Panel    pnlSummary;
-        private Label    lblStatA;
-        private Label    lblStatB;
-        private Label    lblConflicts;
-        private Label    lblOutputPath;
-        private Panel    pnlDelete;
-        private Label    lblDeleteInfo;
-        private CheckBox chkKeepFiles;
-        private Label    lblSaveStatus;
-        private Button   btnSave;
-        private Button   btnClose;
+        // ── Control declarations ────────────────────────────────────────────
+        private AppTitleBar   titleBar;
+        private Label         lblTitle;
+        private RoundedPanel  pnlSummary;
+        private Label         lblStatA;
+        private Label         lblStatB;
+        private Label         lblConflicts;
+        private Label         lblOutputPath;
+        private RoundedPanel  pnlDelete;
+        private Label         lblDeleteTitle;
+        private Label         lblDeleteInfo;
+        private CheckBox      chkKeepFiles;
+        private Label         lblSaveStatus;
+        private ModernButton  btnSave;
+        private ModernButton  btnClose;
     }
 }
