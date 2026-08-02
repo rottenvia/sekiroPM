@@ -23,23 +23,38 @@ namespace SekiroParamMerger.WinForms
             pnlHeader = new RoundedPanel
             {
                 Location = new Point(18, 62),
-                Size = new Size(964, 62),
+                Size = new Size(964, 74),
                 CornerRadius = 14,
                 FillColor = Styling.BackgroundMid,
                 BorderColor = Styling.BorderColor
             };
 
-            lblHeader = MakeHeader("Merge two gameparam files", new Point(18, 8));
-            lblHeader.ForeColor = Styling.TextPrimary;
-            lblHeader.Font = Styling.FontAppTitle;
+            lblHeader = new Label
+            {
+                Text = "Merge two gameparam files",
+                Location = new Point(20, 12),
+                Size = new Size(920, 26),
+                ForeColor = Styling.TextPrimary,
+                Font = Styling.FontAppTitle,
+                TextAlign = ContentAlignment.MiddleLeft,
+                BackColor = Styling.BackgroundMid
+            };
 
-            lblSubtitle = MakeSecondary("Both mods keep their changes — no more overriding each other.", new Point(19, 38));
-            lblSubtitle.Size = new Size(900, 16);
+            lblSubtitle = new Label
+            {
+                Text = "Both mods keep their changes — no more overriding each other.",
+                Location = new Point(22, 46),
+                Size = new Size(920, 18),
+                ForeColor = Styling.TextSecondary,
+                Font = Styling.FontAppSub,
+                TextAlign = ContentAlignment.MiddleLeft,
+                BackColor = Styling.BackgroundMid
+            };
 
             pnlHeader.Controls.AddRange(new Control[] { lblHeader, lblSubtitle });
 
             // ══ GAME FOLDER card ═══════════════════════════════════════════
-            pnlGame = new RoundedPanel { Location = new Point(18, 136), Size = new Size(964, 108) };
+            pnlGame = new RoundedPanel { Location = new Point(18, 144), Size = new Size(964, 108) };
 
             lblGameSection = MakeHeader("GAME FOLDER", new Point(16, 12));
             lblGameFolderHint = MakeSecondary("Select once — the folder containing sekiro.exe. Vanilla gameparam is found automatically.", new Point(16, 36));
@@ -56,7 +71,7 @@ namespace SekiroParamMerger.WinForms
             pnlGame.Controls.AddRange(new Control[] { lblGameSection, lblGameFolderHint, txtGameFolder, btnBrowseGame, lblVanillaStatus });
 
             // ══ MOD A card ═════════════════════════════════════════════════
-            pnlModA = new RoundedPanel { Location = new Point(18, 256), Size = new Size(475, 200) };
+            pnlModA = new RoundedPanel { Location = new Point(18, 264), Size = new Size(475, 200) };
 
             lblModASection = MakeHeader("MOD A", new Point(16, 12));
             lblModASection.ForeColor = Styling.ModAColor;
@@ -85,7 +100,7 @@ namespace SekiroParamMerger.WinForms
             pnlModA.Controls.AddRange(new Control[] { lblModASection, lblModAPriority, lblModAName, lblModAFile, txtModAPath, btnBrowseModA, lblModAPath });
 
             // ══ MOD B card ═════════════════════════════════════════════════
-            pnlModB = new RoundedPanel { Location = new Point(507, 256), Size = new Size(475, 200) };
+            pnlModB = new RoundedPanel { Location = new Point(507, 264), Size = new Size(475, 200) };
 
             lblModBSection = MakeHeader("MOD B", new Point(16, 12));
             lblModBSection.ForeColor = Styling.ModBColor;
@@ -114,7 +129,7 @@ namespace SekiroParamMerger.WinForms
             pnlModB.Controls.AddRange(new Control[] { lblModBSection, lblModBPriority, lblModBName, lblModBFile, txtModBPath, btnBrowseModB, lblModBPath });
 
             // ══ OUTPUT FOLDER card ═════════════════════════════════════════
-            pnlOutput = new RoundedPanel { Location = new Point(18, 476), Size = new Size(964, 118) };
+            pnlOutput = new RoundedPanel { Location = new Point(18, 484), Size = new Size(964, 118) };
 
             lblOutputSection = MakeHeader("OUTPUT FOLDER", new Point(16, 12));
             lblOutputHint = MakeSecondary("Merged file saves to [output]\\param\\gameparam\\gameparam.parambnd.dcx — remembered between sessions", new Point(16, 36));
@@ -139,7 +154,7 @@ namespace SekiroParamMerger.WinForms
             pnlOutput.Controls.AddRange(new Control[] { lblOutputSection, lblOutputHint, txtOutputFolder, btnBrowseOutput, chkKeepModFiles });
 
             // ══ Progress card (hidden by default) ═══════════════════════════
-            pnlProgress = new RoundedPanel { Location = new Point(18, 606), Size = new Size(964, 46), Visible = false };
+            pnlProgress = new RoundedPanel { Location = new Point(18, 614), Size = new Size(964, 46), Visible = false };
 
             lblProgressText = MakeSecondary("", new Point(16, 6));
             lblProgressText.Size = new Size(560, 16);

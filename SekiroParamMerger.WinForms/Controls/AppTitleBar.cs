@@ -124,15 +124,18 @@ namespace SekiroParamMerger.WinForms
                 return;
 
             int pad = 18;
-            int y = (Height - 20) / 2;
 
-            // brand + credit sit on one line, vertically centered
-            _brand.Location  = new Point(pad, y);
-            _credit.Location = new Point(_brand.Right + 10, y + 5);
-
-            // buttons on the right
+            // buttons on the right, vertically centered
             _btnClose.Location = new Point(Width - pad - 32, (Height - 32) / 2);
             _btnMin.Location   = new Point(_btnClose.Left - 32 - 8, (Height - 32) / 2);
+
+            // brand + credit on one line, vertically centered against the brand
+            _brand.Location = new Point(pad, (Height - _brand.Height) / 2);
+
+            // vertically center the credit against the brand's middle
+            int brandMid = _brand.Top + (_brand.Height / 2);
+            int creditTop = brandMid - (_credit.Height / 2);
+            _credit.Location = new Point(_brand.Right + 10, creditTop);
 
             // optional heading between brand and buttons
             int headingRight = _btnMin.Left - 14;
@@ -144,8 +147,9 @@ namespace SekiroParamMerger.WinForms
             else
             {
                 _heading.Visible = true;
-                _heading.Location = new Point(headingLeft, y + 3);
-                _heading.MaximumSize = new Size(Math.Max(0, headingRight - headingLeft), 20);
+                int headingMid = brandMid;
+                _heading.Location = new Point(headingLeft, headingMid - (_heading.Height / 2));
+                _heading.MaximumSize = new Size(Math.Max(0, headingRight - headingLeft), _heading.Height);
             }
         }
     }

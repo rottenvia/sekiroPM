@@ -60,6 +60,13 @@ namespace SekiroParamMerger.WinForms
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
+            // Fill the entire control rectangle with the container-matching color
+            // FIRST so the corners outside the rounded shape blend seamlessly
+            // (otherwise they show black/dark fringes). Then draw the rounded
+            // shape on top.
+            using (var bgBrush = new SolidBrush(BackColor))
+                g.FillRectangle(bgBrush, ClientRectangle);
+
             RectangleF rect = new RectangleF(0, 0, Width - 1f, Height - 1f);
             using var path = Styling.RoundedRect(rect, CornerRadius);
 

@@ -43,6 +43,11 @@ namespace SekiroParamMerger.WinForms
             var g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            // Fill the whole control with the title-bar color first so the corners
+            // outside the circle are not black fringes.
+            using (var bgBrush = new SolidBrush(BackColor))
+                g.FillRectangle(bgBrush, ClientRectangle);
+
             Rectangle rect = new Rectangle(2, 2, Width - 5, Height - 5);
             Color circle = IsClose ? Styling.AccentRed : Styling.BackgroundLight;
 
