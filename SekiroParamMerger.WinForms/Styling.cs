@@ -38,9 +38,9 @@ namespace SekiroParamMerger.WinForms
         public static readonly Font FontTiny     = new Font("Segoe UI", 8f, FontStyle.Regular);
         public static readonly Font FontMono     = new Font("Consolas", 9f, FontStyle.Regular);
 
-        // Branding — "GHOST" + "MOD ENGINE" custom title bar
-        public static readonly Font FontBrand    = new Font("Segoe UI", 16f, FontStyle.Bold);
-        public static readonly Font FontBrandSub = new Font("Segoe UI", 9f, FontStyle.Bold);
+        // Branding — "sekiroPM" custom title bar
+        public static readonly Font FontBrand    = new Font("Segoe UI", 15f, FontStyle.Bold);
+        public static readonly Font FontCredit   = new Font("Segoe UI", 8f, FontStyle.Regular);
         public static readonly Font FontAppTitle = new Font("Segoe UI", 18f, FontStyle.Bold);
         public static readonly Font FontAppSub   = new Font("Segoe UI", 9.5f, FontStyle.Regular);
 

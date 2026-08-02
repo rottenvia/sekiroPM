@@ -3,9 +3,9 @@ using System.ComponentModel;
 namespace SekiroParamMerger.WinForms
 {
     /// <summary>
-    /// The custom title bar — a CTk-style header with the "GHOST" + "MOD ENGINE"
-    /// brand on the left, an optional heading, and round minimize/close buttons
-    /// on the right. Supports dragging the window by grabbing anywhere on it.
+    /// The custom title bar — a CTk-style header with the "sekiroPM" brand and a
+    /// small "made by eggyeg" credit on the left, round minimize/close buttons on
+    /// the right. Supports dragging the window by grabbing anywhere on it.
     /// </summary>
     public class AppTitleBar : Panel
     {
@@ -13,7 +13,7 @@ namespace SekiroParamMerger.WinForms
         public event EventHandler? MinimizeClicked;
 
         private readonly Label _brand;
-        private readonly Label _brandSub;
+        private readonly Label _credit;
         private readonly Label _heading;
         private readonly RoundTitleButton _btnMin;
         private readonly RoundTitleButton _btnClose;
@@ -21,12 +21,15 @@ namespace SekiroParamMerger.WinForms
         private bool _dragging;
         private Point _dragStart;
 
-        /// <summary>Optional heading text shown between the brand and the buttons.</summary>
+        /// <summary>
+        /// Optional heading text shown after the brand (e.g. "CONFLICT RESOLVER").
+        /// Empty string hides it — used by the main window which only shows the brand.
+        /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Heading
         {
             get => _heading.Text;
-            set { _heading.Text = value; }
+            set { _heading.Text = value; Invalidate(); }
         }
 
         public AppTitleBar()
@@ -34,14 +37,15 @@ namespace SekiroParamMerger.WinForms
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
-                   | ControlStyles.ResizeRedraw, true);
+                   | ControlStyles.ResizeRedraw
+                   | ControlStyles.SupportsTransparentBackColor, true);
 
             // Create all child controls BEFORE setting Height. Setting Height fires
             // OnResize/OnSizeChanged, and the layout code touches these children — if
             // they are still null we get a NullReferenceException at startup.
-            _brand    = MakeLabel("GHOST", Styling.FontBrand, Styling.AccentGold);
-            _brandSub = MakeLabel("MOD ENGINE", Styling.FontBrandSub, Styling.TextSecondary);
-            _heading  = MakeLabel("", Styling.FontSmall, Styling.TextSecondary);
+            _brand   = MakeLabel("sekiroPM", Styling.FontBrand, Styling.TextPrimary);
+            _credit  = MakeLabel("made by eggyeg", Styling.FontCredit, Styling.TextSecondary);
+            _heading = MakeLabel("", Styling.FontSmall, Styling.TextSecondary);
 
             _btnMin   = new RoundTitleButton { Glyph = "—" };
             _btnClose = new RoundTitleButton { Glyph = "✕", IsClose = true };
@@ -52,12 +56,12 @@ namespace SekiroParamMerger.WinForms
             BackColor = Styling.TitleBarColor;
             Height    = Styling.TitleBarHeight;
 
-            Controls.AddRange(new Control[] { _brand, _brandSub, _heading, _btnMin, _btnClose });
+            Controls.AddRange(new Control[] { _brand, _credit, _heading, _btnMin, _btnClose });
 
             // dragging: grab the bar background or the brand labels
             ApplyDrag(this);
             ApplyDrag(_brand);
-            ApplyDrag(_brandSub);
+            ApplyDrag(_credit);
             ApplyDrag(_heading);
         }
 
@@ -115,24 +119,25 @@ namespace SekiroParamMerger.WinForms
 
             // Defensive: OnResize can fire before the constructor has assigned all
             // children (e.g. while setting Height). Layout is a no-op until they exist.
-            if (_brand == null || _brandSub == null || _heading == null
+            if (_brand == null || _credit == null || _heading == null
                 || _btnMin == null || _btnClose == null)
                 return;
 
             int pad = 18;
             int y = (Height - 20) / 2;
 
-            // brand
+            // brand + credit sit on one line, vertically centered
             _brand.Location  = new Point(pad, y);
-            _brandSub.Location = new Point(pad + _brand.Width + 8, y + 6);
+            _credit.Location = new Point(_brand.Right + 10, y + 5);
 
-            // heading (right-aligned block sits before buttons)
+            // buttons on the right
             _btnClose.Location = new Point(Width - pad - 32, (Height - 32) / 2);
             _btnMin.Location   = new Point(_btnClose.Left - 32 - 8, (Height - 32) / 2);
 
+            // optional heading between brand and buttons
             int headingRight = _btnMin.Left - 14;
-            int headingLeft  = _brandSub.Right + 20;
-            if (headingRight - headingLeft < 40)
+            int headingLeft  = _credit.Right + 22;
+            if (string.IsNullOrEmpty(_heading.Text) || headingRight - headingLeft < 40)
             {
                 _heading.Visible = false;
             }
