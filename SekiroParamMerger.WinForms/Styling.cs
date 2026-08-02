@@ -87,9 +87,17 @@ namespace SekiroParamMerger.WinForms
 
         private static void ApplyWindowRegion(Form form, int radius)
         {
-            if (form.Width < 1 || form.Height < 1) return;
-            IntPtr region = Native.CreateRoundRectRgn(0, 0, form.Width + 1, form.Height + 1, radius, radius);
-            Native.SetWindowRgn(form.Handle, region, true);
+            try
+            {
+                if (form.Width < 1 || form.Height < 1) return;
+                IntPtr region = Native.CreateRoundRectRgn(0, 0, form.Width + 1, form.Height + 1, radius, radius);
+                Native.SetWindowRgn(form.Handle, region, true);
+            }
+            catch
+            {
+                // If the region fails, keep the window square and visible rather
+                // than risk making it invisible.
+            }
         }
 
         /// <summary>Rounded-rectangle GraphicsPath helper used by custom controls.</summary>

@@ -67,8 +67,10 @@ namespace SekiroParamMerger.WinForms
             {
                 Log("Constructing MainForm...");
                 var form = new MainForm();
-                Log("MainForm constructed. Opening window...");
+                Log($"MainForm constructed. Visible={form.Visible} WindowState={form.WindowState} IsHandleCreated={form.IsHandleCreated}");
+                Log("Calling Application.Run(form)...");
                 Application.Run(form);
+                Log($"Application.Run returned. Visible={form.Visible} IsDisposed={form.IsDisposed}");
                 Log("Application exited normally (window was closed).");
             }
             catch (Exception ex)

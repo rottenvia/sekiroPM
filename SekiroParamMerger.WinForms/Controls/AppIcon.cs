@@ -13,7 +13,15 @@ namespace SekiroParamMerger.WinForms
         public static Icon Create()
         {
             if (_cached != null) return _cached;
-            _cached = Build();
+            try
+            {
+                _cached = Build();
+            }
+            catch
+            {
+                // Never let icon creation crash the app or prevent the window.
+                _cached = SystemIcons.Application;
+            }
             return _cached;
         }
 

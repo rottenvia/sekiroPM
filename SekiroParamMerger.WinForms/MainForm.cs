@@ -549,7 +549,15 @@ namespace SekiroParamMerger.WinForms
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            SetupTray();
+            try
+            {
+                SetupTray();
+            }
+            catch
+            {
+                // A tray failure must never prevent the window from showing.
+                _trayIcon = null;
+            }
         }
 
         private void chkKeepModFiles_CheckedChanged(object sender, EventArgs e) => SaveSettings();
