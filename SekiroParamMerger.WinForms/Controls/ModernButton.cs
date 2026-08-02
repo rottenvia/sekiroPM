@@ -28,7 +28,8 @@ namespace SekiroParamMerger.WinForms
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
-                   | ControlStyles.ResizeRedraw, true);
+                   | ControlStyles.ResizeRedraw
+                   | ControlStyles.SupportsTransparentBackColor, true);
             FlatStyle      = FlatStyle.Flat;
             FlatAppearance.BorderSize = 0;
             ForeColor      = TextColor;

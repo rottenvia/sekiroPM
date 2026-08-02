@@ -20,7 +20,8 @@ namespace SekiroParamMerger.WinForms
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
-                   | ControlStyles.ResizeRedraw, true);
+                   | ControlStyles.ResizeRedraw
+                   | ControlStyles.SupportsTransparentBackColor, true);
             Size       = new Size(32, 32);
             BackColor  = Color.Transparent;
             Font       = new Font("Segoe UI", 11f, FontStyle.Bold);
