@@ -25,12 +25,51 @@ namespace SekiroParamMerger.WinForms
 
         public MainForm()
         {
+            Program.Log("MainForm: constructor start");
             InitializeComponent();
+            Program.Log("MainForm: InitializeComponent done");
             _settings = AppSettings.Load();
             ApplyStyling();
             LoadSettings();
             CheckFirstRun();
             ShowOodleWarning();
+            Program.Log("MainForm: constructor end");
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            Program.Log("MainForm: OnHandleCreated");
+            base.OnHandleCreated(e);
+            try
+            {
+                SetupTray();
+            }
+            catch
+            {
+                // A tray failure must never prevent the window from showing.
+                _trayIcon = null;
+            }
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            Program.Log($"MainForm: OnShown (Visible={Visible})");
+            base.OnShown(e);
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            Program.Log($"MainForm: OnFormClosing (reason={e.CloseReason}, exiting={_exiting})");
+            if (!_exiting)
+            {
+                // The custom close button always exits; any other path (Alt+F4)
+                // minimizes to tray instead to avoid losing work.
+                e.Cancel = true;
+                MinimizeToTray();
+                return;
+            }
+            _trayIcon?.Dispose();
+            base.OnFormClosing(e);
         }
 
         /// <summary>
@@ -530,34 +569,6 @@ namespace SekiroParamMerger.WinForms
         {
             // CTk-style: closing the window exits the app (no maximize button).
             ExitApplication();
-        }
-
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            if (!_exiting)
-            {
-                // The custom close button always exits; any other path (Alt+F4)
-                // minimizes to tray instead to avoid losing work.
-                e.Cancel = true;
-                MinimizeToTray();
-                return;
-            }
-            _trayIcon?.Dispose();
-            base.OnFormClosing(e);
-        }
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            try
-            {
-                SetupTray();
-            }
-            catch
-            {
-                // A tray failure must never prevent the window from showing.
-                _trayIcon = null;
-            }
         }
 
         private void chkKeepModFiles_CheckedChanged(object sender, EventArgs e) => SaveSettings();

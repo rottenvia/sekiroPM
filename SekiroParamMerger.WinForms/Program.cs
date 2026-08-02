@@ -94,7 +94,7 @@ namespace SekiroParamMerger.WinForms
             catch { /* message box itself failed — log is the fallback */ }
         }
 
-        private static void Log(string message)
+        internal static void Log(string message)
         {
             try
             {
