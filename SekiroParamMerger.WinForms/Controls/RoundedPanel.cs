@@ -72,7 +72,7 @@ namespace SekiroParamMerger.WinForms
                 g.FillPath(fill, path);
 
             // subtle top highlight for depth (a slightly lighter top edge)
-            float hl = Math.Min(12f, CornerRadius);
+            int hl = Math.Min(12, CornerRadius);
             RectangleF top = new RectangleF(1f, 1f, Width - 2f, hl);
             using (var topPath = Styling.RoundedRect(top, hl))
             using (var topBrush = new LinearGradientBrush(
