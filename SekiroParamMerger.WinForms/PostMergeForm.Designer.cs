@@ -83,6 +83,7 @@ namespace SekiroParamMerger.WinForms
             // ══ Buttons ════════════════════════════════════════════════════
             btnSave = new ModernButton
             {
+                BackColor = Styling.BackgroundDark,
                 Text = "💾  SAVE MERGED FILE",
                 Location = new Point(18, 476),
                 Size = new Size(724, 46),
@@ -97,6 +98,7 @@ namespace SekiroParamMerger.WinForms
 
             btnClose = new ModernButton
             {
+                BackColor = Styling.BackgroundDark,
                 Text = "Close",
                 Location = new Point(18, 530),
                 Size = new Size(724, 36),

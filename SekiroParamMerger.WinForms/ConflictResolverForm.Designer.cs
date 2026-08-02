@@ -60,6 +60,7 @@ namespace SekiroParamMerger.WinForms
             // ══ Choice buttons ═════════════════════════════════════════════
             btnUseModA = new ModernButton
             {
+                BackColor = Styling.BackgroundDark,
                 Location = new Point(18, 450),
                 Size = new Size(384, 42),
                 BaseColor = Styling.ModAColor,
@@ -73,6 +74,7 @@ namespace SekiroParamMerger.WinForms
 
             btnUseModB = new ModernButton
             {
+                BackColor = Styling.BackgroundDark,
                 Location = new Point(418, 450),
                 Size = new Size(384, 42),
                 BaseColor = Styling.ModBColor,
@@ -98,6 +100,7 @@ namespace SekiroParamMerger.WinForms
 
             btnAllModA = new ModernButton
             {
+                BackColor = Styling.BackgroundMid,
                 Text = "Mod A wins ALL remaining",
                 Location = new Point(342, 10),
                 Size = new Size(214, 30),
@@ -111,6 +114,7 @@ namespace SekiroParamMerger.WinForms
 
             btnAllModB = new ModernButton
             {
+                BackColor = Styling.BackgroundMid,
                 Text = "Mod B wins ALL remaining",
                 Location = new Point(564, 10),
                 Size = new Size(206, 30),
@@ -127,6 +131,7 @@ namespace SekiroParamMerger.WinForms
             // ══ Done button ════════════════════════════════════════════════
             btnDone = new ModernButton
             {
+                BackColor = Styling.BackgroundDark,
                 Text = "✓  DONE — APPLY ALL RESOLUTIONS",
                 Location = new Point(18, 566),
                 Size = new Size(784, 44),

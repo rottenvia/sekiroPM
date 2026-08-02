@@ -26,15 +26,19 @@ namespace SekiroParamMerger.WinForms
 
         public ModernButton()
         {
+            // IMPORTANT: we do NOT use a transparent back color. A transparent
+            // background on a custom-painted control produces dark fringes along
+            // the rounded edges (the classic "black edges" artifact). Instead we
+            // paint the whole control and let the corners blend into a parent-
+            // matching opaque BackColor.
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
-                   | ControlStyles.ResizeRedraw
-                   | ControlStyles.SupportsTransparentBackColor, true);
+                   | ControlStyles.ResizeRedraw, true);
             FlatStyle      = FlatStyle.Flat;
             FlatAppearance.BorderSize = 0;
             ForeColor      = TextColor;
-            BackColor      = Color.Transparent;
+            BackColor      = Styling.BackgroundMid; // opaque — override per container
             Cursor         = Cursors.Hand;
         }
 

@@ -100,9 +100,7 @@ namespace SekiroParamMerger.WinForms
             this.MinimizeBox = false;
 
             Styling.StyleTextBox(txtGameFolder);
-            Styling.StyleTextBox(txtModAName);
             Styling.StyleTextBox(txtModAPath);
-            Styling.StyleTextBox(txtModBName);
             Styling.StyleTextBox(txtModBPath);
             Styling.StyleTextBox(txtOutputFolder);
 
@@ -240,9 +238,7 @@ namespace SekiroParamMerger.WinForms
 
             _modAPath = path;
             txtModAPath.Text = path;
-
-            if (string.IsNullOrWhiteSpace(txtModAName.Text))
-                txtModAName.Text = SuggestModName(path) ?? "Mod A";
+            lblModAName.Text = SuggestModName(path) ?? "Mod A";
 
             SetStatus("Mod A selected.", Styling.TextSuccess);
             UpdateMergeButtonState();
@@ -255,9 +251,7 @@ namespace SekiroParamMerger.WinForms
 
             _modBPath = path;
             txtModBPath.Text = path;
-
-            if (string.IsNullOrWhiteSpace(txtModBName.Text))
-                txtModBName.Text = SuggestModName(path) ?? "Mod B";
+            lblModBName.Text = SuggestModName(path) ?? "Mod B";
 
             SetStatus("Mod B selected.", Styling.TextSuccess);
             UpdateMergeButtonState();
@@ -329,8 +323,8 @@ namespace SekiroParamMerger.WinForms
 
         private async void btnMerge_Click(object sender, EventArgs e)
         {
-            string modAName = string.IsNullOrWhiteSpace(txtModAName.Text) ? "Mod A" : txtModAName.Text.Trim();
-            string modBName = string.IsNullOrWhiteSpace(txtModBName.Text) ? "Mod B" : txtModBName.Text.Trim();
+            string modAName = string.IsNullOrWhiteSpace(lblModAName.Text) || lblModAName.Text == "—" ? "Mod A" : lblModAName.Text.Trim();
+            string modBName = string.IsNullOrWhiteSpace(lblModBName.Text) || lblModBName.Text == "—" ? "Mod B" : lblModBName.Text.Trim();
 
             if (!File.Exists(_modAPath)) { ShowError($"Mod A file not found:\n{_modAPath}"); return; }
             if (!File.Exists(_modBPath)) { ShowError($"Mod B file not found:\n{_modBPath}"); return; }
@@ -420,8 +414,8 @@ namespace SekiroParamMerger.WinForms
             _modBPath = string.Empty;
             txtModAPath.Text = string.Empty;
             txtModBPath.Text = string.Empty;
-            txtModAName.Text = string.Empty;
-            txtModBName.Text = string.Empty;
+            lblModAName.Text = "—";
+            lblModBName.Text = "—";
 
             UpdateMergeButtonState();
         }

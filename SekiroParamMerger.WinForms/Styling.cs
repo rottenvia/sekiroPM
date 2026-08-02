@@ -41,8 +41,12 @@ namespace SekiroParamMerger.WinForms
         // Branding — "sekiroPM" custom title bar
         public static readonly Font FontBrand    = new Font("Segoe UI", 15f, FontStyle.Bold);
         public static readonly Font FontCredit   = new Font("Segoe UI", 8f, FontStyle.Regular);
-        public static readonly Font FontAppTitle = new Font("Segoe UI", 18f, FontStyle.Bold);
+        public static readonly Font FontAppTitle = new Font("Segoe UI", 19f, FontStyle.Bold);
         public static readonly Font FontAppSub   = new Font("Segoe UI", 9.5f, FontStyle.Regular);
+
+        // Polished UI fonts
+        public static readonly Font FontDisplay  = new Font("Segoe UI Semibold", 13f, FontStyle.Bold);   // mod names
+        public static readonly Font FontLabel    = new Font("Segoe UI Semibold", 9f, FontStyle.Bold);     // small field labels
 
         // ── Sizes ─────────────────────────────────────────────────────────────
         public static readonly int CornerRadius  = 6;

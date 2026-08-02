@@ -17,13 +17,14 @@ namespace SekiroParamMerger.WinForms
 
         public RoundTitleButton()
         {
+            // Opaque BackColor matching the title bar avoids the "black edges"
+            // fringe that a transparent back color produces on rounded controls.
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
-                   | ControlStyles.ResizeRedraw
-                   | ControlStyles.SupportsTransparentBackColor, true);
+                   | ControlStyles.ResizeRedraw, true);
             Size       = new Size(32, 32);
-            BackColor  = Color.Transparent;
+            BackColor  = Styling.TitleBarColor;
             Font       = new Font("Segoe UI", 11f, FontStyle.Bold);
             Cursor     = Cursors.Hand;
             TabStop    = false;

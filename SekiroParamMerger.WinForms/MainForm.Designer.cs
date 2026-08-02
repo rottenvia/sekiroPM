@@ -56,46 +56,62 @@ namespace SekiroParamMerger.WinForms
             pnlGame.Controls.AddRange(new Control[] { lblGameSection, lblGameFolderHint, txtGameFolder, btnBrowseGame, lblVanillaStatus });
 
             // ══ MOD A card ═════════════════════════════════════════════════
-            pnlModA = new RoundedPanel { Location = new Point(18, 256), Size = new Size(475, 208) };
+            pnlModA = new RoundedPanel { Location = new Point(18, 256), Size = new Size(475, 200) };
 
             lblModASection = MakeHeader("MOD A", new Point(16, 12));
             lblModASection.ForeColor = Styling.ModAColor;
-            lblModAPriority = MakeSecondary("Higher priority — wins unresolved conflicts", new Point(16, 40));
+            lblModAPriority = MakeSecondary("Higher priority — wins unresolved conflicts", new Point(16, 38));
 
-            lblModAName = MakeSecondary("Name:", new Point(16, 66));
-            txtModAName = new TextBox { Location = new Point(16, 86), Size = new Size(443, 30), PlaceholderText = "e.g. Combat Overhaul", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
+            lblModAName = new Label
+            {
+                Text = "—",
+                Location = new Point(16, 58),
+                AutoSize = true,
+                ForeColor = Styling.ModAColor,
+                Font = Styling.FontDisplay,
+                BackColor = Styling.BackgroundMid
+            };
 
-            lblModAFile = MakeSecondary("PARAM FILE:", new Point(16, 124));
-            txtModAPath = new TextBox { Location = new Point(16, 142), Size = new Size(327, 30), ReadOnly = true, PlaceholderText = "No file selected", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
+            lblModAFile = MakeLabelTiny("PARAM FILE", new Point(16, 90));
+            txtModAPath = new TextBox { Location = new Point(16, 106), Size = new Size(331, 30), ReadOnly = true, PlaceholderText = "gameparam.parambnd.dcx", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
 
-            btnBrowseModA = new ModernButton { Text = "Browse…", Location = new Point(355, 140), Size = new Size(104, 34), BaseColor = Styling.ButtonBackground, HoverColor = Styling.ButtonHover, CornerRadius = 10 };
+            btnBrowseModA = new ModernButton { Text = "Browse…", Location = new Point(357, 104), Size = new Size(102, 34), BaseColor = Styling.ButtonBackground, HoverColor = Styling.ButtonHover, CornerRadius = 10, BackColor = Styling.BackgroundMid };
             btnBrowseModA.Click += btnBrowseModA_Click;
 
-            lblModAPath = MakeSecondary("Select gameparam.parambnd.dcx from Mod A's folder", new Point(16, 180));
-            lblModAPath.Size = new Size(443, 18);
+            lblModAPath = MakeSecondary("Pick the mod's gameparam.parambnd.dcx", new Point(16, 146));
+            lblModAPath.Size = new Size(443, 16);
+            lblModAPath.ForeColor = Styling.TextSecondary;
 
-            pnlModA.Controls.AddRange(new Control[] { lblModASection, lblModAPriority, lblModAName, txtModAName, lblModAFile, txtModAPath, btnBrowseModA, lblModAPath });
+            pnlModA.Controls.AddRange(new Control[] { lblModASection, lblModAPriority, lblModAName, lblModAFile, txtModAPath, btnBrowseModA, lblModAPath });
 
             // ══ MOD B card ═════════════════════════════════════════════════
-            pnlModB = new RoundedPanel { Location = new Point(507, 256), Size = new Size(475, 208) };
+            pnlModB = new RoundedPanel { Location = new Point(507, 256), Size = new Size(475, 200) };
 
             lblModBSection = MakeHeader("MOD B", new Point(16, 12));
             lblModBSection.ForeColor = Styling.ModBColor;
-            lblModBPriority = MakeSecondary("Lower priority — you pick on each conflict", new Point(16, 40));
+            lblModBPriority = MakeSecondary("Lower priority — you pick on each conflict", new Point(16, 38));
 
-            lblModBName = MakeSecondary("Name:", new Point(16, 66));
-            txtModBName = new TextBox { Location = new Point(16, 86), Size = new Size(443, 30), PlaceholderText = "e.g. Enemy Rebalance", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
+            lblModBName = new Label
+            {
+                Text = "—",
+                Location = new Point(16, 58),
+                AutoSize = true,
+                ForeColor = Styling.ModBColor,
+                Font = Styling.FontDisplay,
+                BackColor = Styling.BackgroundMid
+            };
 
-            lblModBFile = MakeSecondary("PARAM FILE:", new Point(16, 124));
-            txtModBPath = new TextBox { Location = new Point(16, 142), Size = new Size(327, 30), ReadOnly = true, PlaceholderText = "No file selected", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
+            lblModBFile = MakeLabelTiny("PARAM FILE", new Point(16, 90));
+            txtModBPath = new TextBox { Location = new Point(16, 106), Size = new Size(331, 30), ReadOnly = true, PlaceholderText = "gameparam.parambnd.dcx", BackColor = Styling.BackgroundLight, ForeColor = Styling.TextPrimary, BorderStyle = BorderStyle.FixedSingle, Font = Styling.FontSmall };
 
-            btnBrowseModB = new ModernButton { Text = "Browse…", Location = new Point(355, 140), Size = new Size(104, 34), BaseColor = Styling.ButtonBackground, HoverColor = Styling.ButtonHover, CornerRadius = 10 };
+            btnBrowseModB = new ModernButton { Text = "Browse…", Location = new Point(357, 104), Size = new Size(102, 34), BaseColor = Styling.ButtonBackground, HoverColor = Styling.ButtonHover, CornerRadius = 10, BackColor = Styling.BackgroundMid };
             btnBrowseModB.Click += btnBrowseModB_Click;
 
-            lblModBPath = MakeSecondary("Select gameparam.parambnd.dcx from Mod B's folder", new Point(16, 180));
-            lblModBPath.Size = new Size(443, 18);
+            lblModBPath = MakeSecondary("Pick the mod's gameparam.parambnd.dcx", new Point(16, 146));
+            lblModBPath.Size = new Size(443, 16);
+            lblModBPath.ForeColor = Styling.TextSecondary;
 
-            pnlModB.Controls.AddRange(new Control[] { lblModBSection, lblModBPriority, lblModBName, txtModBName, lblModBFile, txtModBPath, btnBrowseModB, lblModBPath });
+            pnlModB.Controls.AddRange(new Control[] { lblModBSection, lblModBPriority, lblModBName, lblModBFile, txtModBPath, btnBrowseModB, lblModBPath });
 
             // ══ OUTPUT FOLDER card ═════════════════════════════════════════
             pnlOutput = new RoundedPanel { Location = new Point(18, 476), Size = new Size(964, 118) };
@@ -160,6 +176,7 @@ namespace SekiroParamMerger.WinForms
                 TextColor = Color.White,
                 Font = Styling.FontMedium,
                 CornerRadius = 14,
+                BackColor = Styling.BackgroundDark,
                 Enabled = false
             };
             btnMerge.Click += btnMerge_Click;
@@ -202,6 +219,19 @@ namespace SekiroParamMerger.WinForms
             };
         }
 
+        private static Label MakeLabelTiny(string text, Point location)
+        {
+            return new Label
+            {
+                Text = text,
+                Font = Styling.FontLabel,
+                ForeColor = Styling.TextSecondary,
+                AutoSize = true,
+                Location = location,
+                BackColor = Styling.BackgroundMid
+            };
+        }
+
         // ── Control declarations ────────────────────────────────────────────
         private AppTitleBar    titleBar;
         private RoundedPanel   pnlHeader;
@@ -217,7 +247,6 @@ namespace SekiroParamMerger.WinForms
         private Label          lblModASection;
         private Label          lblModAPriority;
         private Label          lblModAName;
-        private TextBox        txtModAName;
         private Label          lblModAFile;
         private TextBox        txtModAPath;
         private ModernButton   btnBrowseModA;
@@ -226,7 +255,6 @@ namespace SekiroParamMerger.WinForms
         private Label          lblModBSection;
         private Label          lblModBPriority;
         private Label          lblModBName;
-        private TextBox        txtModBName;
         private Label          lblModBFile;
         private TextBox        txtModBPath;
         private ModernButton   btnBrowseModB;
