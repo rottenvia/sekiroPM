@@ -13,10 +13,9 @@ namespace SekiroParamMerger.WinForms
         [STAThread]
         static void Main()
         {
+            Log("=== Application starting ===");
+
             // ── Global exception handling: never let a startup error die silently ──
-            // WinForms exceptions on the UI thread terminate the process with no
-            // dialog by default. Catching them here surfaces the real problem so the
-            // user can see it instead of a "silent crash".
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             Application.ThreadException += (_, e) => ShowFatal(e.Exception);
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
@@ -31,10 +30,6 @@ namespace SekiroParamMerger.WinForms
 
             try
             {
-                // Generated from the project settings (net9.0-windows + UseWindowsForms).
-                // The <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-                // property already makes this set high-DPI mode, so we don't call
-                // Application.SetHighDpiMode separately.
                 ApplicationConfiguration.Initialize();
             }
             catch (Exception ex)
@@ -44,20 +39,16 @@ namespace SekiroParamMerger.WinForms
             }
 
             // ── Validate oo2core DLL ─────────────────────────────────────────
-            // IMPORTANT: even if the DLL is missing we still open the main window
-            // so the app is never "silently dead". MainForm reads OodleReady /
-            // OodleMessage and shows a clear warning + disables merging until the
-            // user drops oo2core_6_win64.dll next to the exe (or installs Sekiro).
             string toolDir = AppContext.BaseDirectory;
             try
             {
                 OodleValidationResult oodleResult = OodleValidator.Validate(toolDir);
                 OodleReady = oodleResult.IsValid;
                 OodleMessage = oodleResult.Message;
+                Log($"Oodle: ready={OodleReady}  {OodleMessage}");
 
                 if (!oodleResult.IsValid)
                 {
-                    // Tell the user what to do, then still show the window.
                     MessageBox.Show(
                         oodleResult.Message,
                         "Missing Required DLL",
@@ -69,36 +60,60 @@ namespace SekiroParamMerger.WinForms
             {
                 OodleReady = false;
                 OodleMessage = "Could not validate oo2core_6_win64.dll: " + ex.Message;
-                ShowFatal(ex);
+                LogError(ex);
             }
-
-            // ── Write a small startup log for diagnosis ──────────────────────
-            try
-            {
-                string logPath = Path.Combine(toolDir, "startup.log");
-                File.WriteAllText(logPath,
-                    $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] oo2core ready: {OodleReady}\n" +
-                    $"{OodleMessage}\n");
-            }
-            catch { /* logging is best-effort */ }
 
             try
             {
-                Application.Run(new MainForm());
+                Log("Constructing MainForm...");
+                var form = new MainForm();
+                Log("MainForm constructed. Opening window...");
+                Application.Run(form);
+                Log("Application exited normally (window was closed).");
             }
             catch (Exception ex)
             {
-                ShowFatal(ex);
+                LogError(ex);
             }
         }
 
+        /// <summary>Shows the error to the user AND writes it to error.log.</summary>
         private static void ShowFatal(Exception ex)
         {
-            MessageBox.Show(
-                "An unexpected error occurred:\n\n" + ex,
-                "Sekiro Param Merger — Fatal Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+            LogError(ex);
+            try
+            {
+                MessageBox.Show(
+                    "An unexpected error occurred:\n\n" + ex,
+                    "Sekiro Param Merger — Fatal Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            catch { /* message box itself failed — log is the fallback */ }
+        }
+
+        private static void Log(string message)
+        {
+            try
+            {
+                string logPath = Path.Combine(AppContext.BaseDirectory, "startup.log");
+                File.AppendAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}\n");
+            }
+            catch { /* best-effort */ }
+        }
+
+        private static void LogError(Exception ex)
+        {
+            string full = ex.ToString();
+            Log("EXCEPTION: " + full);
+            try
+            {
+                string errorPath = Path.Combine(AppContext.BaseDirectory, "error.log");
+                File.AppendAllText(
+                    errorPath,
+                    $"===== {DateTime.Now:yyyy-MM-dd HH:mm:ss} =====\n{full}\n\n");
+            }
+            catch { /* best-effort */ }
         }
     }
 }
