@@ -71,19 +71,6 @@ namespace SekiroParamMerger.WinForms
             using (var fill = new SolidBrush(FillColor))
                 g.FillPath(fill, path);
 
-            // subtle top highlight for depth (a slightly lighter top edge)
-            int hl = Math.Min(12, CornerRadius);
-            RectangleF top = new RectangleF(1f, 1f, Width - 2f, hl);
-            using (var topPath = Styling.RoundedRect(top, hl))
-            using (var topBrush = new LinearGradientBrush(
-                       new RectangleF(0, 0, Width, hl),
-                       Color.FromArgb(38, 38, 38),
-                       FillColor,
-                       LinearGradientMode.Vertical))
-            {
-                g.FillPath(topBrush, topPath);
-            }
-
             if (BorderThickness > 0)
             {
                 // inset border so it stays fully inside the clipping region

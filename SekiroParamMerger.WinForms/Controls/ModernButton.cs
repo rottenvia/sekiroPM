@@ -5,6 +5,10 @@ namespace SekiroParamMerger.WinForms
 {
     /// <summary>
     /// A flat, rounded, hover-highlighted button — the CTk-button look.
+    /// The control is clipped to the rounded shape via a Region, so the corners
+    /// outside the rounded path are genuinely transparent (the parent shows
+    /// through) — this completely eliminates the "black square" / fringe artifact
+    /// that a transparent back color or rectangle fill would produce.
     /// </summary>
     public class ModernButton : Button
     {
@@ -26,11 +30,6 @@ namespace SekiroParamMerger.WinForms
 
         public ModernButton()
         {
-            // IMPORTANT: we do NOT use a transparent back color. A transparent
-            // background on a custom-painted control produces dark fringes along
-            // the rounded edges (the classic "black edges" artifact). Instead we
-            // paint the whole control and let the corners blend into a parent-
-            // matching opaque BackColor.
             SetStyle(ControlStyles.AllPaintingInWmPaint
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
@@ -38,8 +37,28 @@ namespace SekiroParamMerger.WinForms
             FlatStyle      = FlatStyle.Flat;
             FlatAppearance.BorderSize = 0;
             ForeColor      = TextColor;
-            BackColor      = Styling.BackgroundMid; // opaque — override per container
+            BackColor      = Styling.BackgroundMid;
             Cursor         = Cursors.Hand;
+        }
+
+        // ── Region clipping: cut out the corners so the parent shows through ──
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            RecreateRegion();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            RecreateRegion();
+        }
+
+        private void RecreateRegion()
+        {
+            if (Width < 1 || Height < 1) return;
+            using var path = Styling.RoundedRect(new RectangleF(0, 0, Width, Height), CornerRadius);
+            Region = new Region(path);
         }
 
         protected override void OnMouseEnter(EventArgs e) { _hover = true;  Invalidate(); base.OnMouseEnter(e); }
@@ -52,20 +71,15 @@ namespace SekiroParamMerger.WinForms
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            // blank — we paint the background
+            // With Region clipping the corners are already cut out, so we only
+            // need to paint the rounded body — no rectangle fill that could show
+            // as a mismatched "square".
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
-
-            // Fill the entire control rectangle with the container-matching color
-            // FIRST so the corners outside the rounded shape blend seamlessly
-            // (otherwise they show black/dark fringes). Then draw the rounded
-            // shape on top.
-            using (var bgBrush = new SolidBrush(BackColor))
-                g.FillRectangle(bgBrush, ClientRectangle);
 
             RectangleF rect = new RectangleF(0, 0, Width - 1f, Height - 1f);
             using var path = Styling.RoundedRect(rect, CornerRadius);

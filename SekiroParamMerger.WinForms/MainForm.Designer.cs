@@ -23,7 +23,7 @@ namespace SekiroParamMerger.WinForms
             pnlHeader = new RoundedPanel
             {
                 Location = new Point(18, 62),
-                Size = new Size(964, 74),
+                Size = new Size(964, 78),
                 CornerRadius = 14,
                 FillColor = Styling.BackgroundMid,
                 BorderColor = Styling.BorderColor
@@ -33,7 +33,7 @@ namespace SekiroParamMerger.WinForms
             {
                 Text = "Merge two gameparam files",
                 Location = new Point(20, 12),
-                Size = new Size(920, 26),
+                Size = new Size(920, 34),
                 ForeColor = Styling.TextPrimary,
                 Font = Styling.FontAppTitle,
                 TextAlign = ContentAlignment.MiddleLeft,
@@ -43,8 +43,8 @@ namespace SekiroParamMerger.WinForms
             lblSubtitle = new Label
             {
                 Text = "Both mods keep their changes — no more overriding each other.",
-                Location = new Point(22, 46),
-                Size = new Size(920, 18),
+                Location = new Point(22, 50),
+                Size = new Size(920, 20),
                 ForeColor = Styling.TextSecondary,
                 Font = Styling.FontAppSub,
                 TextAlign = ContentAlignment.MiddleLeft,
