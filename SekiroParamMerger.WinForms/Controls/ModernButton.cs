@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace SekiroParamMerger.WinForms
@@ -7,12 +8,18 @@ namespace SekiroParamMerger.WinForms
     /// </summary>
     public class ModernButton : Button
     {
-        public int   CornerRadius { get; set; } = 8;
-        public Color BaseColor    { get; set; } = Styling.ButtonBackground;
-        public Color HoverColor   { get; set; } = Styling.ButtonHover;
-        public Color BorderColor  { get; set; } = Styling.BorderColor;
-        public Color TextColor    { get; set; } = Styling.TextPrimary;
-        public int   BorderSize   { get; set; } = 1;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int CornerRadius { get; set; } = 8;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color BaseColor { get; set; } = Styling.ButtonBackground;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color HoverColor { get; set; } = Styling.ButtonHover;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color BorderColor { get; set; } = Styling.BorderColor;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color TextColor { get; set; } = Styling.TextPrimary;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int BorderSize { get; set; } = 1;
 
         private bool _hover;
 

@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace SekiroParamMerger.WinForms
 {
     /// <summary>
@@ -6,8 +8,10 @@ namespace SekiroParamMerger.WinForms
     /// </summary>
     public class RoundTitleButton : Control
     {
-        public string Glyph  { get; set; } = "—";
-        public bool   IsClose { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string Glyph { get; set; } = "—";
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsClose { get; set; }
 
         private bool _hover;
 

@@ -30,6 +30,21 @@ namespace SekiroParamMerger.WinForms
             ApplyStyling();
             LoadSettings();
             CheckFirstRun();
+            ShowOodleWarning();
+        }
+
+        /// <summary>
+        /// If the oo2core DLL is missing, surface it clearly in the status bar so
+        /// the window always opens and the user always knows why merging is blocked.
+        /// </summary>
+        private void ShowOodleWarning()
+        {
+            if (Program.OodleReady) return;
+            SetStatus(
+                "⚠ " + (string.IsNullOrWhiteSpace(Program.OodleMessage)
+                    ? "oo2core_6_win64.dll is missing."
+                    : Program.OodleMessage),
+                Styling.TextWarning);
         }
 
         // ── Styling ───────────────────────────────────────────────────────────
@@ -266,7 +281,8 @@ namespace SekiroParamMerger.WinForms
                 !string.IsNullOrWhiteSpace(_modBPath) &&
                 !string.IsNullOrWhiteSpace(txtOutputFolder.Text) &&
                 _settings.VanillaFileExists &&
-                _loader != null;
+                _loader != null &&
+                Program.OodleReady;
 
             if (btnMerge.Enabled)
                 SetStatus("Ready to merge. Click MERGE when ready.", Styling.TextSuccess);
@@ -442,7 +458,8 @@ namespace SekiroParamMerger.WinForms
             btnMerge.Enabled        = enabled && _loader != null && _settings.VanillaFileExists
                                       && !string.IsNullOrWhiteSpace(_modAPath)
                                       && !string.IsNullOrWhiteSpace(_modBPath)
-                                      && !string.IsNullOrWhiteSpace(txtOutputFolder.Text);
+                                      && !string.IsNullOrWhiteSpace(txtOutputFolder.Text)
+                                      && Program.OodleReady;
             btnBrowseModA.Enabled   = enabled;
             btnBrowseModB.Enabled   = enabled;
             btnBrowseGame.Enabled   = enabled;

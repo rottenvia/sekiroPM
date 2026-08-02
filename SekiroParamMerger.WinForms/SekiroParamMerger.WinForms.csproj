@@ -11,6 +11,14 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyName>SekiroParamMerger</AssemblyName>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <!--
+      WFO1000 is a .NET 9 WinForms analyzer ERROR raised on any public property of a
+      Control-derived class that doesn't declare DesignerSerializationVisibility.
+      Our custom controls (RoundedPanel, ModernButton, RoundTitleButton, ...) expose
+      runtime-styled properties that should never be serialized by the visual designer,
+      so we suppress it project-wide (the properties already carry the attribute).
+    -->
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

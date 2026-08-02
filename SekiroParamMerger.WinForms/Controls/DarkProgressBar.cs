@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace SekiroParamMerger.WinForms
@@ -8,12 +9,18 @@ namespace SekiroParamMerger.WinForms
     /// </summary>
     public class DarkProgressBar : Control
     {
-        public int     Value          { get; private set; }
-        public int     Maximum        { get; set; } = 100;
-        public bool    IsIndeterminate{ get; set; }
-        public Color   TrackColor     { get; set; } = Styling.BackgroundLight;
-        public Color   FillColor      { get; set; } = Styling.AccentRed;
-        public int     CornerRadius   { get; set; } = 8;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int Value { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int Maximum { get; set; } = 100;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool IsIndeterminate { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color TrackColor { get; set; } = Styling.BackgroundLight;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color FillColor { get; set; } = Styling.AccentRed;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int CornerRadius { get; set; } = 8;
 
         private int _animOffset;
 

@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace SekiroParamMerger.WinForms
 {
     /// <summary>
@@ -20,6 +22,7 @@ namespace SekiroParamMerger.WinForms
         private Point _dragStart;
 
         /// <summary>Optional heading text shown between the brand and the buttons.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Heading
         {
             get => _heading.Text;

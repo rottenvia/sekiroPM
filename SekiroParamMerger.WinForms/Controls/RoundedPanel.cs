@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace SekiroParamMerger.WinForms
@@ -9,10 +10,14 @@ namespace SekiroParamMerger.WinForms
     /// </summary>
     public class RoundedPanel : Panel
     {
-        public int   CornerRadius   { get; set; } = Styling.CardRadius;
-        public Color FillColor      { get; set; } = Styling.BackgroundMid;
-        public Color BorderColor    { get; set; } = Styling.BorderColor;
-        public int   BorderThickness{ get; set; } = 1;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int CornerRadius { get; set; } = Styling.CardRadius;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color FillColor { get; set; } = Styling.BackgroundMid;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Color BorderColor { get; set; } = Styling.BorderColor;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int BorderThickness { get; set; } = 1;
 
         public RoundedPanel()
         {
