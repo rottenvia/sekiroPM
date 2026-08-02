@@ -35,18 +35,22 @@ namespace SekiroParamMerger.WinForms
                    | ControlStyles.OptimizedDoubleBuffer
                    | ControlStyles.UserPaint
                    | ControlStyles.ResizeRedraw, true);
-            Height   = Styling.TitleBarHeight;
-            BackColor = Styling.TitleBarColor;
 
-            _brand = MakeLabel("GHOST", Styling.FontBrand, Styling.AccentGold);
+            // Create all child controls BEFORE setting Height. Setting Height fires
+            // OnResize/OnSizeChanged, and the layout code touches these children — if
+            // they are still null we get a NullReferenceException at startup.
+            _brand    = MakeLabel("GHOST", Styling.FontBrand, Styling.AccentGold);
             _brandSub = MakeLabel("MOD ENGINE", Styling.FontBrandSub, Styling.TextSecondary);
-            _heading = MakeLabel("", Styling.FontSmall, Styling.TextSecondary);
+            _heading  = MakeLabel("", Styling.FontSmall, Styling.TextSecondary);
 
             _btnMin   = new RoundTitleButton { Glyph = "—" };
             _btnClose = new RoundTitleButton { Glyph = "✕", IsClose = true };
 
             _btnMin.Click   += (_, _) => MinimizeClicked?.Invoke(this, EventArgs.Empty);
             _btnClose.Click += (_, _) => CloseClicked?.Invoke(this, EventArgs.Empty);
+
+            BackColor = Styling.TitleBarColor;
+            Height    = Styling.TitleBarHeight;
 
             Controls.AddRange(new Control[] { _brand, _brandSub, _heading, _btnMin, _btnClose });
 
@@ -108,6 +112,12 @@ namespace SekiroParamMerger.WinForms
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+
+            // Defensive: OnResize can fire before the constructor has assigned all
+            // children (e.g. while setting Height). Layout is a no-op until they exist.
+            if (_brand == null || _brandSub == null || _heading == null
+                || _btnMin == null || _btnClose == null)
+                return;
 
             int pad = 18;
             int y = (Height - 20) / 2;
