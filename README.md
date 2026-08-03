@@ -29,7 +29,7 @@ the merged output contains BOTH changes.
 
 ## Setup
 1. Clone this repo:
-   git clone https://github.com/YOURUSERNAME/sekiroPM.git
+   git clone https://github.com/eggyeg/sekiroPM.git
 
 2. Clone SoulsFormatsNEXT into the SAME folder as the repo:
    cd sekiroPM
